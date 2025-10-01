@@ -1,0 +1,166 @@
+-- Crear esquemas
+CREATE SCHEMA Comunes;
+CREATE SCHEMA Seguridad;
+
+-- Crear tabla LogTransacciones
+CREATE TABLE [Comunes].[LogTransacciones](
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [ModificadoPor] [varchar](25) NOT NULL,
+    [OrigenTransaccion] [varchar](50) NOT NULL
+) ON [PRIMARY];
+
+-- Crear tabla LogTransaccionesDetalle
+CREATE TABLE [Comunes].[LogTransaccionesDetalle](
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [EntidadDominio] [varchar](50) NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL
+) ON [PRIMARY];
+
+-- Crear tabla Pantalla
+CREATE TABLE [Seguridad].[Pantalla](
+    [PantallaId] [varchar](50) NOT NULL,
+    [Descripcion] [varchar](100) NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    CONSTRAINT [PK_Pantalla] PRIMARY KEY CLUSTERED 
+    (
+        [PantallaId] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Pantalla_transacciones
+CREATE TABLE [Seguridad].[Pantalla_transacciones](
+    [Uid] [int] IDENTITY(1,1) NOT NULL,
+    [PantallaId] [varchar](50) NOT NULL,
+    [Descripcion] [varchar](100) NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    CONSTRAINT [PK_Pantalla_transacciones] PRIMARY KEY CLUSTERED 
+    (
+        [Uid] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Permisos
+CREATE TABLE [Seguridad].[Permisos](
+    [RolId] [varchar](25) NOT NULL,
+    [PantallaId] [varchar](50) NOT NULL,
+    [Ver] [bit] NOT NULL,
+    [Editar] [bit] NOT NULL,
+    [Eliminar] [bit] NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    CONSTRAINT [PK_Permisos] PRIMARY KEY CLUSTERED 
+    (
+        [RolId] ASC,
+        [PantallaId] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Permisos_Transacciones
+CREATE TABLE [Seguridad].[Permisos_Transacciones](
+    [Uid] [int] IDENTITY(1,1) NOT NULL,
+    [RolId] [varchar](25) NOT NULL,
+    [PantallaId] [varchar](50) NOT NULL,
+    [Ver] [bit] NOT NULL,
+    [Editar] [bit] NOT NULL,
+    [Eliminar] [bit] NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    CONSTRAINT [PK_Permisos_Transacciones] PRIMARY KEY CLUSTERED 
+    (
+        [Uid] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Rol
+CREATE TABLE [Seguridad].[Rol](
+    [RolId] [varchar](25) NOT NULL,
+    [Descripcion] [varchar](25) NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    CONSTRAINT [PK_Rol] PRIMARY KEY CLUSTERED 
+    (
+        [RolId] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Rol_Transacciones
+CREATE TABLE [Seguridad].[Rol_Transacciones](
+    [Uid] [int] IDENTITY(1,1) NOT NULL,
+    [RolId] [varchar](25) NOT NULL,
+    [Descripcion] [varchar](25) NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    CONSTRAINT [PK_Rol_Transacciones] PRIMARY KEY CLUSTERED 
+    (
+        [Uid] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Crear tabla Usuario
+CREATE TABLE [Seguridad].[Usuario](
+    [UsuarioId] [varchar](25) NOT NULL,
+    [Nombre] [varchar](50) NOT NULL,
+    [Apellido] [varchar](50) NOT NULL,
+    [Contrasena] [varchar](250) NOT NULL,
+    [RolId] [varchar](25) NOT NULL,
+    [Activo] [bit] NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL,
+    CONSTRAINT [PK_Usuario] PRIMARY KEY CLUSTERED 
+    (
+        [UsuarioId] ASC
+    ) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- Establecer valor por defecto para el campo Activo
+ALTER TABLE [Seguridad].[Usuario] ADD CONSTRAINT [DF_Usuario_Activo] DEFAULT ((1)) FOR [Activo];
+
+-- Crear tabla Usuario_Transacciones
+CREATE TABLE [Seguridad].[Usuario_Transacciones](
+    [Uid] [int] IDENTITY(1,1) NOT NULL,
+    [UsuarioId] [varchar](25) NOT NULL,
+    [Nombre] [varchar](50) NOT NULL,
+    [Apellido] [varchar](50) NOT NULL,
+    [Contrasena] [varchar](250) NOT NULL,
+    [RolId] [varchar](25) NOT NULL,
+    [Activo] [bit] NOT NULL,
+    [FechaTransaccion] [datetime] NOT NULL,
+    [DescripcionTransaccion] [varchar](50) NOT NULL,
+    [ModificadoPor] [varchar](20) NOT NULL,
+    [RowVersion] [timestamp] NOT NULL,
+    [TipoTransaccion] [varchar](50) NOT NULL,
+    [TransaccionUId] [uniqueidentifier] NOT NULL
+) ON [PRIMARY];
