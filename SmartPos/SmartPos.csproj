@@ -27,4 +27,10 @@
     <ProjectReference Include="..\Infraestructura\Infraestructura.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
 </Project>

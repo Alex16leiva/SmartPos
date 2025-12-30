@@ -1,10 +1,9 @@
 ﻿using Infraestructura.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartPos.ViewModels;
 using SmartPos.Views;
-using System.Configuration;
-using System.Data;
 using System.IO;
 using System.Windows;
 
@@ -43,10 +42,11 @@ namespace SmartPos
                 .Build();
             services.AddSingleton<IConfiguration>(configuration);
 
+
+            string connectionString = configuration.GetConnectionString("conectionDataBase");
             // 2. Base de Datos (Transient para que cada repo tenga su propio context)
-            services.AddDbContext<SmartPostDbContext>(options => {
-                // Tu config aquí
-            }, ServiceLifetime.Transient);
+            services.AddDbContext<SmartPostDbContext>(options => options.UseSqlServer(connectionString), 
+                ServiceLifetime.Transient);
 
             // 3. Mapeo de Interfaz (DEBE SER TRANSIENT TAMBIÉN)
             services.AddTransient<IDataContext>(sp => sp.GetRequiredService<SmartPostDbContext>());
@@ -62,5 +62,4 @@ namespace SmartPos
             services.AddTransient<Views.MainWindow>();
         }
     }
-
 }
