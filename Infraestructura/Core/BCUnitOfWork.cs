@@ -15,7 +15,7 @@ namespace Infraestructura.Core
     public class BCUnitOfWork : DbContext
     {
         private string Transact { get; set; }
-        public BCUnitOfWork(DbContextOptions<MyContext>? context)
+        public BCUnitOfWork(DbContextOptions<SmartPostDbContext>? context)
             : base(context)
         {
             Database.SetCommandTimeout((int)TimeSpan.FromSeconds(1).TotalSeconds);

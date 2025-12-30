@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infraestructura.Context
 {
-    public class MyContext : BCUnitOfWork, IDataContext
+    public class SmartPostDbContext : BCUnitOfWork, IDataContext
     {
-        public MyContext(DbContextOptions<MyContext> context)
+        public SmartPostDbContext(DbContextOptions<SmartPostDbContext> context)
             : base(context)
         {
             Database.SetCommandTimeout((int)TimeSpan.FromSeconds(1).TotalSeconds);
