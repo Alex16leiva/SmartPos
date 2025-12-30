@@ -40,14 +40,18 @@
                  x:Name="txtPassword"/>
 
             <Button Content="INICIAR SESIÓN" 
-            Style="{StaticResource MahApps.Styles.Button.Flat}"
-            Background="{DynamicResource MahApps.Brushes.Accent}"
-            Foreground="White"
-            Height="45"
-            Margin="0,20,0,10"
-            Click="BtnLogin_Click"/>
+                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                Background="{DynamicResource MahApps.Brushes.Accent}"
+                Foreground="White"
+                Height="45"
+                Margin="0,20,0,10"
+            />
 
-            <TextBlock Text="v1.0.0" HorizontalAlignment="Right" Foreground="Silver" FontSize="10"/>
+            <TextBlock Text="v1.0.0" 
+                       HorizontalAlignment="Right" 
+                       Foreground="Silver" 
+                       FontSize="10"
+            />
         </StackPanel>
 
     </Grid>

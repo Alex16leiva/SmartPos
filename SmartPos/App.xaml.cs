@@ -1,4 +1,5 @@
-﻿using Infraestructura.Context;
+﻿using Aplicacion.Services;
+using Infraestructura.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +61,9 @@ namespace SmartPos
 
             // 6. Vistas
             services.AddTransient<Views.MainWindow>();
+
+            // 7. ApplicationServices
+            services.AddScoped<SecurityAplicationService>();
         }
     }
 }
