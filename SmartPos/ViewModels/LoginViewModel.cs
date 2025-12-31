@@ -24,9 +24,15 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private string _errorMessage;
 
         [RelayCommand]
-        private async Task Login()
+        private async Task Login(object parameter)
         {
-            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
+            // Casteamos el parámetro al tipo PasswordBox de WPF
+            var passwordBox = parameter as System.Windows.Controls.PasswordBox;
+
+            // Obtenemos el texto (esto es lo que antes te llegaba vacío)
+            string passwordClara = passwordBox?.Password;
+
+            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(passwordClara))
             {
                 ErrorMessage = "Por favor, ingrese sus credenciales.";
                 return;
@@ -39,10 +45,10 @@ namespace SmartPos.ViewModels
                     new Aplicacion.DTOs.Seguridad.UserRequest 
                     {
                         UsuarioId = Username,
-                        Password = Password
+                        Password = passwordClara
                     });
 
-            if (result.IsNotNull())
+            if (result.IsNotNull() && result.UsuarioAutenticado)
             {
                 // Obtenemos la MainWindow desde nuestro contenedor de dependencias
                 var mainWindow = App.ServiceProvider.GetService<SmartPos.Views.MainWindow>();

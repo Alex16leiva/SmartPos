@@ -44,6 +44,8 @@
                 Style="{StaticResource MahApps.Styles.Button.Flat}"
                 Background="{DynamicResource MahApps.Brushes.Accent}"
                 Command="{Binding LoginCommand}"
+                CommandParameter="{Binding ElementName=txtPassword}"
+                IsDefault="True"
                 Foreground="White"
                 Height="45"
                 Margin="0,20,0,10"

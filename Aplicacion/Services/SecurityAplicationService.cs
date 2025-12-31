@@ -15,13 +15,10 @@ namespace Aplicacion.Services
     public class SecurityAplicationService : BaseDisposable
     {
         private readonly IGenericRepository<IDataContext> _genericRepository;
-        private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
-        public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository, ITokenService tokenService, IMapper mapper)
+        
+        public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository)
         {
             _genericRepository = genericRepository;
-            _tokenService = tokenService;
-            _mapper = mapper;
         }
 
         public UsuarioDTO EditarUsuario(EdicionUsuarioRequest request)
@@ -140,7 +137,7 @@ namespace Aplicacion.Services
             _genericRepository.Add(usuario);
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("AgregarUsuario");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
-            return _mapper.Map<UsuarioDTO>(usuario);
+            return new UsuarioDTO();
         }
 
         public UsuarioDTO IniciarSesion(UserRequest request)
@@ -162,7 +159,6 @@ namespace Aplicacion.Services
                     Apellido = usuario.Apellido,
                     Nombre = usuario.Nombre,
                     RolId = usuario.RolId,
-                    Token = _tokenService.Generate(usuario),
                     UsuarioAutenticado = true,
                     UsuarioId = usuario.UsuarioId,
                     Permisos = MapPermisosDto(usuario.Rol?.Permisos)

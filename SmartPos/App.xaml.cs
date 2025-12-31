@@ -58,9 +58,11 @@ namespace SmartPos
             // 5. ViewModels
             services.AddSingleton<MainViewModel>();
             services.AddTransient<InventarioViewModel>();
+            services.AddTransient<LoginViewModel>();
 
             // 6. Vistas
             services.AddTransient<Views.MainWindow>();
+            services.AddTransient<LoginView>();
 
             // 7. ApplicationServices
             services.AddScoped<SecurityAplicationService>();
