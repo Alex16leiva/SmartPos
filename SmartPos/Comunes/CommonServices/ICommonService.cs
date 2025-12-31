@@ -16,5 +16,7 @@ namespace SmartPos.Comunes.CommonServices
         void ShowError(string message);
 
         void ShowSuccess(string message);
+
+        void ShowInfo(string message);
     }
 }

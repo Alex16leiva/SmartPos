@@ -25,6 +25,20 @@
                          Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
                          Width="400" FontSize="16" Height="35"/>
                 <mah:ProgressRing IsActive="{Binding IsBusy}" Margin="15,0,0,0" Width="25" Height="25"/>
+
+                <Button Command="{Binding NuevoArticuloCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
+                        Height="35" Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE109;" 
+                            FontFamily="Segoe MDL2 Assets" 
+                            VerticalAlignment="Center" 
+                            Margin="0,0,8,0"/>
+                        <TextBlock Text="NUEVO ARTÍCULO" 
+                            VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
             </StackPanel>
 
             <DataGrid Grid.Row="1" 
@@ -93,33 +107,65 @@
         </Border>
 
         <mah:FlyoutsControl Panel.ZIndex="11">
-            <mah:Flyout Header="Detalles del Artículo" 
-                        Position="Right" 
-                        Width="350" 
-                        Theme="Adapt"
-                        IsOpen="{Binding IsEditFlyoutOpen}">
-                <Grid Margin="15">
-                    <StackPanel>
-                        <TextBlock Text="Editar Artículo" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+            <mah:Flyout Header="GESTIÓN DE ARTÍCULO" 
+            Position="Right" 
+            Width="450" 
+            Theme="Adapt"
+            IsOpen="{Binding IsEditFlyoutOpen}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20">
+                        <StackPanel>
+                            <TextBlock Text="Datos Principales" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
 
-                        <TextBlock Text="Descripción" Margin="0,10,0,5"/>
-                        <TextBox Text="{Binding ArticuloSeleccionado.Descripcion, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Código de Artículo (ID)"/>
+                            <TextBox Text="{Binding ArticuloSeleccionado.ArticuloId}" 
+                         IsEnabled="{Binding IsNuevoArticulo}" 
+                         Margin="0,5,0,15" mah:TextBoxHelper.Watermark="Ej: 1001"/>
 
-                        <TextBlock Text="Precio de Venta" Margin="0,15,0,5"/>
-                        <mah:NumericUpDown Value="{Binding ArticuloSeleccionado.Precio}" StringFormat="C2" />
+                            <TextBlock Text="Descripción Corta"/>
+                            <TextBox Text="{Binding ArticuloSeleccionado.Descripcion, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="0,5,0,15" mah:TextBoxHelper.Watermark="Nombre del producto"/>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,30,0,0">
-                            <Button Content="Cancelar" 
-                                    Command="{Binding CerrarEdicionCommand}"
-                                    Style="{StaticResource MahApps.Styles.Button.Flat}" 
-                                    Margin="0,0,10,0"/>
-                            <Button Content="Guardar" 
-                                    Command="{Binding GuardarCambiosCommand}"
-                                    Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
-                                    Width="100"/>
+                            <TextBlock Text="Descripción Extendida"/>
+                            <TextBox Text="{Binding ArticuloSeleccionado.DescripcionExtendida}" 
+                         AcceptsReturn="True" Height="60" TextWrapping="Wrap" Margin="0,5,0,15"/>
+
+                            <Separator Margin="0,10"/>
+                            <TextBlock Text="Precios y Costos" FontSize="16" FontWeight="Bold" Margin="0,10,0,10" Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,5,0">
+                                    <TextBlock Text="Costo Actual"/>
+                                    <mah:NumericUpDown Value="{Binding ArticuloSeleccionado.Costo}" StringFormat="C2" Margin="0,5,0,15"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                    <TextBlock Text="Precio Venta"/>
+                                    <mah:NumericUpDown Value="{Binding ArticuloSeleccionado.Precio}" StringFormat="C2" Margin="0,5,0,15"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Separator Margin="0,10"/>
+                            <TextBlock Text="Inventario" FontSize="16" FontWeight="Bold" Margin="0,10,0,10" Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
+
+                            <TextBlock Text="Cantidad Inicial (Existencia)"/>
+                            <mah:NumericUpDown Value="{Binding ArticuloSeleccionado.Cantidad}" 
+                                   IsEnabled="{Binding IsNuevoArticulo}"
+                                   Margin="0,5,0,15"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,20">
+                                <Button Content="CANCELAR" Command="{Binding CerrarEdicionCommand}" 
+                            Style="{StaticResource MahApps.Styles.Button.Flat}" Margin="0,0,10,0"/>
+                                <Button Content="GUARDAR ARTÍCULO" 
+                            Command="{Binding GuardarCambiosCommand}"
+                            Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Width="150"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Grid>
+                    </Grid>
+                </ScrollViewer>
             </mah:Flyout>
         </mah:FlyoutsControl>
     </Grid>

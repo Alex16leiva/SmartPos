@@ -75,5 +75,64 @@ namespace Aplicacion.Services.ArticuloServices
                 
             };
         }
+
+        public async Task<ArticulosDTO> CrearArticuloAsync(ArticuloRequest request)
+        {
+            var existe = await _genericRepository.GetSingleAsync<Articulo>(a => a.ArticuloId == request.Articulo.ArticuloId);
+            if (existe != null)
+            {
+                return new ArticulosDTO { Message = $"El código de artículo {request.Articulo.ArticuloId} ya está en uso." };
+            }
+
+            var nuevoArticulo = new Articulo
+            {
+                ArticuloId = request.Articulo.ArticuloId,
+                Descripcion = request.Articulo.Descripcion,
+                DescripcionExtendida = request.Articulo.DescripcionExtendida,
+                Precio = request.Articulo.Precio,
+                Costo = request.Articulo.Costo,
+                Cantidad = request.Articulo.Cantidad,
+                UltimoCosto = 0, // Por ser nuevo
+            };
+
+            _genericRepository.Add(nuevoArticulo);
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("Creacion de articulo");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+
+            return request.Articulo;
+        }
+
+        public async Task<ArticulosDTO> ActualizarArticuloAsync(ArticuloRequest request)
+        {
+            // 1. Buscar el artículo original en la base de datos
+            var articuloExistente = await _genericRepository.GetSingleAsync<Articulo>(a =>
+                a.ArticuloId == request.Articulo.ArticuloId);
+
+            if (articuloExistente == null)
+            {
+                return new ArticulosDTO { Message = $"No se encontró el artículo con código {request.Articulo.ArticuloId}." };
+            }
+
+            // 2. Lógica de Negocio: Detectar cambio de costo para el histórico
+            if (articuloExistente.Costo != request.Articulo.Costo)
+            {
+                articuloExistente.UltimoCosto = articuloExistente.Costo;
+            }
+
+            // 3. Mapeo de cambios desde el DTO a la Entidad
+            articuloExistente.Descripcion = request.Articulo.Descripcion;
+            articuloExistente.DescripcionExtendida = request.Articulo.DescripcionExtendida;
+            articuloExistente.Precio = request.Articulo.Precio;
+            articuloExistente.Costo = request.Articulo.Costo;
+            // Nota: La cantidad usualmente se maneja por movimientos, 
+            // pero para esta edición directa la actualizamos:
+            articuloExistente.Cantidad = request.Articulo.Cantidad;
+
+            
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("ActualizacionArticulo");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+
+            return request.Articulo;
+        }
     }
 }

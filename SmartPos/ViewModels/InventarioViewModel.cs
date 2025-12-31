@@ -4,6 +4,8 @@ using Aplicacion.Services.ArticuloServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Context.Entidades.Articulos;
+using Dominio.Core.Extensions;
+using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using System.Collections.ObjectModel;
 
@@ -12,9 +14,11 @@ namespace SmartPos.ViewModels
     public partial class InventarioViewModel : ObservableObject
     {
         private readonly IArticuloApplicationService _articuloApplicationService;
-        public InventarioViewModel(IArticuloApplicationService articuloApplicationService)
+        private readonly ICommonService _commonService;
+        public InventarioViewModel(IArticuloApplicationService articuloApplicationService, ICommonService commonService)
         {
             _articuloApplicationService = articuloApplicationService;
+            _commonService = commonService;
             _articulos = new ObservableCollection<ArticulosDTO>();
             LoadDataAsync();
         }
@@ -25,6 +29,7 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private int _paginaActual = 1;
         [ObservableProperty] private int _totalPaginas = 0;
         [ObservableProperty] private int _registrosPorPagina = 10;
+        [ObservableProperty] private bool _isNuevoArticulo;
         public List<int> TamañosPagina { get; } = new() { 10, 20, 30, 50, 100 };
         private CancellationTokenSource _searchCts;
 
@@ -32,10 +37,27 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private ArticulosDTO _articuloSeleccionado;
 
         [RelayCommand]
+        private void NuevoArticulo()
+        {
+            // Preparamos un DTO vacío para el formulario
+            ArticuloSeleccionado = new ArticulosDTO
+            {
+                ArticuloId = string.Empty,
+                Descripcion = string.Empty,
+                Cantidad = 0,
+                Precio = 0,
+                Costo = 0
+            };
+            IsNuevoArticulo = true;
+            IsEditFlyoutOpen = true;
+        }
+
+        [RelayCommand]
         private void EditarArticulo(ArticulosDTO articulo)
         {
             // Hacemos una copia o pasamos la referencia
             ArticuloSeleccionado = articulo;
+            IsNuevoArticulo = false;
             IsEditFlyoutOpen = true;
         }
 
@@ -68,40 +90,42 @@ namespace SmartPos.ViewModels
 
             // 1. Bloqueamos la UI (Activa el ProgressRing que ya tienes en el XAML)
             IsBusy = true;
+            var request = new ArticuloRequest
+            {
+                Articulo = ArticuloSeleccionado,
+                RequestUserInfo = _commonService.GetRequestInfo() // Obtenemos el usuario logueado
+            };
+            if (IsNuevoArticulo)
+            {
+                var resultado = await _articuloApplicationService.CrearArticuloAsync(request);
 
+                // 3. Validar si el servicio retornó un mensaje de error
+                if (resultado.Message.HasValue())
+                {
+                    _commonService.ShowError(resultado.Message);
+                    return;
+                }
+                _commonService.ShowSuccess("Artículo creado correctamente");
+            }
+            else
+            {
+                var resultado = await _articuloApplicationService.ActualizarArticuloAsync(request);
 
-            // 2. Ejecutamos la actualización en un hilo de fondo para no congelar la UI
-            //await Task.Run(async () =>
-            //{
-            //    // Supongamos que tu repositorio tiene un método Update genérico
-            //    var articulo = await _genericRepository.GetSingleAsync<Articulo>(r => r.ArticuloId == ArticuloSeleccionado.ArticuloId);
+                // 3. Validar si el servicio retornó un mensaje de error
+                if (resultado.Message.HasValue())
+                {
+                    _commonService.ShowError(resultado.Message);
+                    return;
+                }
+                _commonService.ShowSuccess("Cambios guardados");
+            }
 
-            //    if (articulo.IsNull())
-            //    {
-            //        return;
-            //    }
+                // 3. Cerramos el panel lateral
+                IsEditFlyoutOpen = false;
 
-            //    // Actualizamos las propiedades necesarias
-            //    articulo.Descripcion = ArticuloSeleccionado.Descripcion;
-            //    articulo.DescripcionExtendida = ArticuloSeleccionado.DescripcionExtendida;
-            //    articulo.Cantidad = ArticuloSeleccionado.Cantidad;
-            //    articulo.Costo = ArticuloSeleccionado.Costo;
-            //    articulo.UltimoCosto = ArticuloSeleccionado.UltimoCosto;
-            //    articulo.Precio = ArticuloSeleccionado.Precio;
-            //    articulo.PrecioA = ArticuloSeleccionado.PrecioA;
-
-            //});
-
-            // 3. Cerramos el panel lateral
-            IsEditFlyoutOpen = false;
-
-            // 4. OPCIONAL: Mostrar una notificación o refrescar la lista
-            // Como el objeto está bindeado, el DataGrid se actualizará solo, 
-            // pero si quieres asegurar la persistencia visual desde DB:
-            // await LoadDataAsync(); 
-            // 5. Liberamos la UI
+            
             IsBusy = false;
-
+            await LoadDataAsync();
         }
 
         [RelayCommand]

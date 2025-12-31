@@ -45,6 +45,11 @@ namespace SmartPos.Comunes.CommonServices
             ShowCustomNotification("Success Message", message, "Success");
         }
 
+        public void ShowInfo(string message)
+        {
+            ShowCustomNotification("Info Message", message, "Info");
+        }
+
         private void ShowCustomNotification(string title, string message, string type = "Success")
         {
             App.Current.Dispatcher.Invoke(() =>
@@ -60,6 +65,13 @@ namespace SmartPos.Comunes.CommonServices
                     "Error" => "✖",   // Icono de error
                     "Warning" => "⚠", // Icono de advertencia
                     _ => "ℹ"         // Icono de información
+                };
+                toast.IconText.Foreground = type switch
+                {
+                    "Success" => System.Windows.Media.Brushes.Green,
+                    "Error" => System.Windows.Media.Brushes.Red,
+                    "Warning" => System.Windows.Media.Brushes.Orange,
+                    _ => System.Windows.Media.Brushes.Blue
                 };
 
                 // 2. Creamos el contenedor Popup
@@ -77,7 +89,7 @@ namespace SmartPos.Comunes.CommonServices
                 // 3. Auto-cierre con un Timer de Backend
                 var timer = new System.Windows.Threading.DispatcherTimer
                 {
-                    Interval = TimeSpan.FromSeconds(3)
+                    Interval = TimeSpan.FromSeconds(5)
                 };
                 timer.Tick += (s, e) =>
                 {
