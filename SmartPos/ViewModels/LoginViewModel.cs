@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using SmartPos.Comunes.CommonServices;
 using System.Windows;
 
 namespace SmartPos.ViewModels
@@ -12,10 +13,13 @@ namespace SmartPos.ViewModels
     public partial class LoginViewModel : ObservableObject
     {
         private readonly SecurityAplicationService _securityAplicationService;
+        private readonly ICommonService _commonService;
 
-        public LoginViewModel(SecurityAplicationService securityAplicationService)
+        public LoginViewModel(SecurityAplicationService securityAplicationService,
+            ICommonService commonService)
         {
             _securityAplicationService = securityAplicationService;
+            _commonService = commonService;
         }
 
         [ObservableProperty] private string _username;
@@ -50,6 +54,8 @@ namespace SmartPos.ViewModels
 
             if (result.IsNotNull() && result.UsuarioAutenticado)
             {
+                _commonService.SetearRequestInfo(result, 1);
+
                 // Obtenemos la MainWindow desde nuestro contenedor de dependencias
                 var mainWindow = App.ServiceProvider.GetService<SmartPos.Views.MainWindow>();
                 mainWindow.Show();
@@ -60,7 +66,7 @@ namespace SmartPos.ViewModels
             }
             else
             {
-                ErrorMessage = "Usuario o contraseña incorrectos.";
+                _commonService.ShowWarning("", result.Message);
             }
 
             IsBusy = false;

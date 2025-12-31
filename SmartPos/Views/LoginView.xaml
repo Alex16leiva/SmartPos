@@ -9,6 +9,7 @@
         Title="SmartPos - Iniciar Sesión" 
         Height="450" Width="400" 
         WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         ResizeMode="NoResize">
     <Grid>

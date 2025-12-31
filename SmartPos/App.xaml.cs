@@ -3,6 +3,7 @@ using Infraestructura.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SmartPos.Comunes.CommonServices;
 using SmartPos.ViewModels;
 using SmartPos.Views;
 using System.IO;
@@ -66,6 +67,7 @@ namespace SmartPos
 
             // 7. ApplicationServices
             services.AddScoped<SecurityAplicationService>();
+            services.AddSingleton<ICommonService, CommonService>();
         }
     }
 }
