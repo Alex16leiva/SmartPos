@@ -11,10 +11,10 @@ namespace SmartPos.Comunes.CommonServices
 
         void SetearRequestInfo(UsuarioDTO usuarioDTO, int caja);
 
-        void ShowSuccess(string title, string message);
+        void ShowWarning(string message);
 
-        void ShowWarning(string title, string message);
+        void ShowError(string message);
 
-        void ShowError(string title, string message);
+        void ShowSuccess(string message);
     }
 }

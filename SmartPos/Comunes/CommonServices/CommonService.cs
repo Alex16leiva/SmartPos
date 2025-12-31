@@ -1,11 +1,8 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Seguridad;
 using Notifications.Wpf.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SmartPos.Comunes.Notificaciones;
+using System.Windows.Controls.Primitives;
 
 namespace SmartPos.Comunes.CommonServices
 {
@@ -33,34 +30,62 @@ namespace SmartPos.Comunes.CommonServices
             };
         }
 
-        public void ShowSuccess(string title, string message)
+        public void ShowWarning(string message)
         {
-            _notificationManager.ShowAsync(new NotificationContent
-            {
-                Title = title,
-                Message = message,
-                Type = NotificationType.Success
-            }, expirationTime: TimeSpan.FromSeconds(3));
+            ShowCustomNotification("Warning Message", message, "Warning");
         }
 
-        public void ShowWarning(string title, string message)
+        public void ShowError(string message)
         {
-            _notificationManager.ShowAsync(new NotificationContent
-            {
-                Title = title,
-                Message = message,
-                Type = NotificationType.Warning
-            }, expirationTime: TimeSpan.FromSeconds(5));
+            ShowCustomNotification("Error Message", message, "Error");
         }
 
-        public void ShowError(string title, string message)
+        public void ShowSuccess(string message)
         {
-            _notificationManager.ShowAsync(new NotificationContent
+            ShowCustomNotification("Success Message", message, "Success");
+        }
+
+        private void ShowCustomNotification(string title, string message, string type = "Success")
+        {
+            App.Current.Dispatcher.Invoke(() =>
             {
-                Title = title,
-                Message = message,
-                Type = NotificationType.Error
-            }, expirationTime: TimeSpan.FromSeconds(5));
+                // 1. Creamos el contenido
+                var toast = new ToastNotification();
+                // Accedemos a los elementos del XAML (puedes usar Bindings si prefieres)
+                toast.TitleText.Text = title; 
+                toast.MessageText.Text = message;
+                toast.IconText.Text = type switch
+                {
+                    "Success" => "✔", // Icono de éxito
+                    "Error" => "✖",   // Icono de error
+                    "Warning" => "⚠", // Icono de advertencia
+                    _ => "ℹ"         // Icono de información
+                };
+
+                // 2. Creamos el contenedor Popup
+                Popup popup = new Popup
+                {
+                    Child = toast,
+                    AllowsTransparency = true,
+                    Placement = PlacementMode.Right, // O PlacementMode.CenterScreen
+                    StaysOpen = false,
+                    PopupAnimation = PopupAnimation.Fade
+                };
+
+                popup.IsOpen = true;
+
+                // 3. Auto-cierre con un Timer de Backend
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(3)
+                };
+                timer.Tick += (s, e) =>
+                {
+                    popup.IsOpen = false;
+                    timer.Stop();
+                };
+                timer.Start();
+            });
         }
     }
 }

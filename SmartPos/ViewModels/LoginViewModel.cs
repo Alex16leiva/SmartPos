@@ -66,7 +66,7 @@ namespace SmartPos.ViewModels
             }
             else
             {
-                _commonService.ShowWarning("", result.Message);
+                _commonService.ShowWarning(result.Message);
             }
 
             IsBusy = false;
