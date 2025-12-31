@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
-using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using SmartPos.ViewModels;
 
 namespace SmartPos.Views
 {
@@ -11,6 +12,7 @@ namespace SmartPos.Views
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = App.ServiceProvider.GetService<MainViewModel>();
         }
     }
 }

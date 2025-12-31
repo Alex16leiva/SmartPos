@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Services;
+using Aplicacion.Services.ArticuloServices;
 using Infraestructura.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -67,6 +68,7 @@ namespace SmartPos
 
             // 7. ApplicationServices
             services.AddScoped<SecurityAplicationService>();
+            services.AddSingleton<IArticuloApplicationService, ArticuloApplicationService>();
             services.AddSingleton<ICommonService, CommonService>();
         }
     }

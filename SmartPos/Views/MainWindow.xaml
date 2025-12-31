@@ -6,8 +6,34 @@
         xmlns:local="clr-namespace:SmartPos"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        WindowState="Maximized"
+        ResizeMode="NoResize"
+        Title="SmartPost - Menú Principal" 
+        Height="450" Width="800">
     <Grid>
+        <mah:HamburgerMenu x:Name="HamburgerMenuControl"
+                           DisplayMode="CompactInline"
+                           IsPaneOpen="False"
+                           ItemsSource="{Binding MenuItems}"
+                           SelectedItem="{Binding SelectedMenuItem}"
+                           Content="{Binding CurrentView}">
 
+            <mah:HamburgerMenu.ItemTemplate>
+                <DataTemplate DataType="{x:Type mah:HamburgerMenuIconItem}">
+                    <Grid Height="48">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Icon}" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Label}" 
+                                   VerticalAlignment="Center" FontSize="16" Margin="10,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </mah:HamburgerMenu.ItemTemplate>
+
+        </mah:HamburgerMenu>
     </Grid>
 </mah:MetroWindow>
+

@@ -1,8 +1,10 @@
-﻿using Dominio.Context.Entidades.Seguridad;
+﻿using Dominio.Context.Entidades.Articulos;
+using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
 using Infraestructura.Context.Mapping.Seguridad;
 using Infraestructura.Core;
 using Microsoft.EntityFrameworkCore;
+using SmartPos.Data.Mapping;
 
 namespace Infraestructura.Context
 {
@@ -18,6 +20,7 @@ namespace Infraestructura.Context
         public virtual DbSet<Rol> Rol {  get; set; }
         public virtual DbSet<Pantalla> Pantalla { get; set; }
         public virtual DbSet<Permisos> Permisos { get; set; }
+        public virtual DbSet<Articulo> Artuculo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +28,7 @@ namespace Infraestructura.Context
             modelBuilder.ApplyConfiguration(new RolMap());
             modelBuilder.ApplyConfiguration(new PantallaMap());
             modelBuilder.ApplyConfiguration(new PermisosMap());
+            modelBuilder.ApplyConfiguration(new ArticuloMap());
             base.OnModelCreating(modelBuilder);
         }
 

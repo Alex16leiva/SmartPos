@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SmartPos.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +25,8 @@ namespace SmartPos.Views
         public InventarioView()
         {
             InitializeComponent();
+
+            this.DataContext = App.ServiceProvider.GetService<InventarioViewModel>();
         }
     }
 }
