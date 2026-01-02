@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SmartPos"
              xmlns:views="clr-namespace:SmartPos.Views"
-             xmlns:viewModels="clr-namespace:SmartPos.ViewModels">
+             xmlns:viewModels="clr-namespace:SmartPos.ViewModels"
+             DispatcherUnhandledException="Application_DispatcherUnhandledException">
+   
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

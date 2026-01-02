@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls;
-using System.Windows.Controls;
 
 namespace SmartPos.ViewModels
 {
@@ -31,6 +30,8 @@ namespace SmartPos.ViewModels
             SelectedMenuItem = (HamburgerMenuItem)MenuItems.FirstOrDefault();
             Navegar(SelectedMenuItem.Label);
         }
+
+
 
         // Este método se dispara automáticamente cuando cambia SelectedMenuItem
         partial void OnSelectedMenuItemChanged(HamburgerMenuItem value)

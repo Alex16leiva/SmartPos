@@ -3,7 +3,6 @@ using Aplicacion.DTOs.Articulos;
 using Aplicacion.Services.ArticuloServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Dominio.Context.Entidades.Articulos;
 using Dominio.Core.Extensions;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
@@ -64,8 +63,6 @@ namespace SmartPos.ViewModels
         [RelayCommand]
         private void CerrarEdicion() => IsEditFlyoutOpen = false;
 
-
-
         async partial void OnTextoBusquedaChanged(string value)
         {
             // Cancelar la búsqueda pendiente si el usuario sigue escribiendo
@@ -83,6 +80,62 @@ namespace SmartPos.ViewModels
             catch (TaskCanceledException) { /* Ignorar cancelación */ }
         }
 
+        // Propiedades para el panel de ajuste
+        [ObservableProperty] private decimal _cantidadAjuste;
+        [ObservableProperty] private decimal _costoAjuste;
+        [ObservableProperty] private string _tipoMovimientoSeleccionado = "ENTRADA";
+        [ObservableProperty] private string _notasAjuste = string.Empty;
+
+        [RelayCommand]
+        private async Task AplicarAjusteMasivo()
+        {
+            if (ArticuloSeleccionado == null || CantidadAjuste <= 0)
+            {
+                _commonService.ShowError("Debe ingresar una cantidad válida.");
+                return;
+            }
+
+            IsBusy = true;
+            // 1. Preparar el Request (Dynamics RMS Style)
+            var request = new ArticuloRequest
+            {
+                Articulo = ArticuloSeleccionado,
+                RequestUserInfo = _commonService.GetRequestInfo(),
+                InventarioMovimiento = new InventarioMovimientoDTO
+                {
+                    ArticuloId = ArticuloSeleccionado.ArticuloId,
+                    CostoUnitario = CostoAjuste,
+                    TipoMovimiento = TipoMovimientoSeleccionado,
+                    Referencia = NotasAjuste,
+                    Notas = NotasAjuste,
+                    CantidadMovimiento = CantidadAjuste,
+                }
+            };
+
+            // 2. Ajustar signo según el tipo seleccionado
+            decimal cantidadFinal = TipoMovimientoSeleccionado == "SALIDA" ? -CantidadAjuste : CantidadAjuste;
+
+            // 3. Llamar al AppService con toda la data de la pantalla
+            var res = await _articuloApplicationService.RegistrarMovimientoAsync(request);
+
+            if (res.Message.IsMissingValue())
+            {
+                _commonService.ShowSuccess("Movimiento de stock registrado.");
+
+                // Limpiar campos después de aplicar
+                CantidadAjuste = 0;
+                NotasAjuste = string.Empty;
+
+                await LoadDataAsync(); // Refrescar stock en pantalla
+            }
+            else
+            {
+                _commonService.ShowError(res.Message);
+            }
+            IsEditFlyoutOpen = false;
+            IsBusy = false;
+        }
+    
         [RelayCommand]
         private async Task GuardarCambios()
         {

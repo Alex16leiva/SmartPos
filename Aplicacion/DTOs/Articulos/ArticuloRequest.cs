@@ -6,5 +6,6 @@ namespace SmartPos.DTOs.Articulos
     public class ArticuloRequest : RequestBase  
     {
         public ArticulosDTO Articulo { get; set; }
+        public InventarioMovimientoDTO InventarioMovimiento { get; set; }
     }
 }

@@ -68,7 +68,7 @@ namespace Infraestructura.Core
                                 changedEntities.Add(new ModifiedEntityEntry(entry, entry.State.ToString()));
                             }
                         }
-
+                            
                     }
                     base.SaveChanges();
 

@@ -1,10 +1,12 @@
 ﻿using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
 using Infraestructura.Context;
+using Infraestructura.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
+using SmartPos.Comunes.Extensions;
 using SmartPos.ViewModels;
 using SmartPos.Views;
 using System.IO;
@@ -12,9 +14,6 @@ using System.Windows;
 
 namespace SmartPos
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         public static IServiceProvider ServiceProvider { get; private set; }
@@ -67,9 +66,18 @@ namespace SmartPos
             services.AddTransient<LoginView>();
 
             // 7. ApplicationServices
-            services.AddScoped<SecurityAplicationService>();
-            services.AddSingleton<IArticuloApplicationService, ArticuloApplicationService>();
             services.AddSingleton<ICommonService, CommonService>();
+            services.AddTransient<SecurityAplicationService>();
+            services.AddTransient<IArticuloApplicationService, ArticuloApplicationService>();
+            services.AddTransient<ILogService, LogService>();
+
+            // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
+            services.AddApplicationServicesWithInterceptors();
+        }
+
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
         }
     }
 }

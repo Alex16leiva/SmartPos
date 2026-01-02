@@ -5,6 +5,7 @@ using Aplicacion.Helpers;
 using Dominio.Context.Entidades.Articulos;
 using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
+using Dominio.Core.Extensions;
 using Infraestructura.Context;
 using SmartPos.DTOs.Articulos;
 
@@ -130,6 +131,58 @@ namespace Aplicacion.Services.ArticuloServices
 
             
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("ActualizacionArticulo");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+
+            return request.Articulo;
+        }
+
+        public async Task<ArticulosDTO> RegistrarMovimientoAsync(ArticuloRequest request)
+        {
+            var articulo = await _genericRepository.GetSingleAsync<Articulo>(a =>
+                a.ArticuloId == request.Articulo.ArticuloId);
+
+            if (articulo.IsNull()) return new ArticulosDTO { Message = $"Articulo {request.Articulo.ArticuloId} no encontrado" };
+
+            // 1. Guardamos estado anterior para el histórico
+            decimal cantidadAnterior = articulo.Cantidad;
+            decimal cantidadReal = request.InventarioMovimiento.CantidadMovimiento;
+            if (request.InventarioMovimiento.TipoMovimiento == "SALIDA" && request.InventarioMovimiento.CantidadMovimiento > 0)
+            {
+                if (articulo.Cantidad < request.InventarioMovimiento.CantidadMovimiento)
+                {
+                    return new ArticulosDTO 
+                    {
+                        Message = $"Error: No hay suficiente stock. Disponible: {articulo.Cantidad}, Intento: {Math.Abs(request.InventarioMovimiento.CantidadMovimiento)}"
+                    };
+                }
+                cantidadReal = request.InventarioMovimiento.CantidadMovimiento * -1;
+            }
+            else if (request.InventarioMovimiento.TipoMovimiento == "ENTRADA" && request.InventarioMovimiento.CantidadMovimiento < 0)
+            {
+                cantidadReal = Math.Abs(request.InventarioMovimiento.CantidadMovimiento); // Aseguramos que entrada sea positiva
+            }
+
+
+            // 2. Actualizamos la entidad principal
+            articulo.Cantidad += cantidadReal;
+
+            // 3. Creamos el registro del movimiento
+            var movimiento = new InventarioMovimiento
+            {
+                ArticuloId = articulo.ArticuloId,
+                CantidadAnterior = cantidadAnterior,
+                CantidadMovimiento = cantidadReal,
+                CantidadNueva = articulo.Cantidad,
+                TipoMovimiento = request.InventarioMovimiento.TipoMovimiento,
+                Referencia = request.InventarioMovimiento.Referencia,
+                Notas = request.InventarioMovimiento.Notas,
+                CostoUnitario = request.InventarioMovimiento.CostoUnitario,
+            };
+
+            _genericRepository.Add(movimiento);
+
+            // 4. Commit con tu infraestructura de auditoría
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("AddInventoryMovement");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
 
             return request.Articulo;

@@ -161,7 +161,7 @@ namespace Aplicacion.Services
                     RolId = usuario.RolId,
                     UsuarioAutenticado = true,
                     UsuarioId = usuario.UsuarioId,
-                    Permisos = MapPermisosDto(usuario.Rol?.Permisos)
+                    Permisos = MapPermisosDto(usuario.Rol?.Permisos?.ToList())
                 };
             }
 
@@ -240,7 +240,7 @@ namespace Aplicacion.Services
             {
                 Descripcion = qry.Descripcion,
                 RolId = qry.RolId,
-                Permisos = MapPermisosDto(qry?.Permisos),
+                Permisos = MapPermisosDto(qry?.Permisos?.ToList()),
             }).ToList();
         }
 

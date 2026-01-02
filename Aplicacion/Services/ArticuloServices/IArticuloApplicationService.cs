@@ -11,5 +11,7 @@ namespace Aplicacion.Services.ArticuloServices
         Task<ArticulosDTO> CrearArticuloAsync(ArticuloRequest request);
 
         Task<ArticulosDTO> ActualizarArticuloAsync(ArticuloRequest request);
+
+        Task<ArticulosDTO> RegistrarMovimientoAsync(ArticuloRequest request);
     }
 }

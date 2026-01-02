@@ -1,6 +1,7 @@
 ﻿using Dominio.Context.Entidades.Articulos;
 using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
+using Infraestructura.Context.Mapping.Articulos;
 using Infraestructura.Context.Mapping.Seguridad;
 using Infraestructura.Core;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace Infraestructura.Context
         public virtual DbSet<Pantalla> Pantalla { get; set; }
         public virtual DbSet<Permisos> Permisos { get; set; }
         public virtual DbSet<Articulo> Artuculo { get; set; }
+        public virtual DbSet<InventarioMovimiento> InventarioMovimiento { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +31,7 @@ namespace Infraestructura.Context
             modelBuilder.ApplyConfiguration(new PantallaMap());
             modelBuilder.ApplyConfiguration(new PermisosMap());
             modelBuilder.ApplyConfiguration(new ArticuloMap());
+            modelBuilder.ApplyConfiguration(new InventarioMovimientoMap());
             base.OnModelCreating(modelBuilder);
         }
 

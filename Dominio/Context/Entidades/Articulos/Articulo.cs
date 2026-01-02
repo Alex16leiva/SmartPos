@@ -61,5 +61,7 @@ namespace Dominio.Context.Entidades.Articulos
         public string? ImagenRuta { get; set; }
         public string? Notas { get; set; }
         public bool Inactivo { get; set; }
+
+        public virtual ICollection<InventarioMovimiento> InventarioMovimientos { get; set; }
     }
 }

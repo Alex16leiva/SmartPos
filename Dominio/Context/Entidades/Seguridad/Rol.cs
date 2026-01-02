@@ -8,7 +8,7 @@ namespace Dominio.Context.Entidades.Seguridad
         [ForeignKey("Usuario")]
         public string? RolId { get; set; }
         public string? Descripcion { get; set; }
-        public virtual List<Permisos>? Permisos { get; set; }
+        public virtual ICollection<Permisos>? Permisos { get; set; }
         public virtual ICollection<Usuario>? Usuarios { get; set; }
 
     }
