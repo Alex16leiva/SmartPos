@@ -160,6 +160,9 @@ namespace Aplicacion.Services.ArticuloServices
             else if (request.InventarioMovimiento.TipoMovimiento == "ENTRADA" && request.InventarioMovimiento.CantidadMovimiento < 0)
             {
                 cantidadReal = Math.Abs(request.InventarioMovimiento.CantidadMovimiento); // Aseguramos que entrada sea positiva
+                articulo.UltimoRecibo = DateTime.Now;
+                articulo.UltimoCosto = articulo.Costo;
+                articulo.Costo = request.InventarioMovimiento.CostoUnitario;
             }
 
 
