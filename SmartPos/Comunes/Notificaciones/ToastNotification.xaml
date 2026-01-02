@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SmartPos.Comunes.Notificaciones"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             Width="300" Height="80" Margin="10">
+             MinWidth="350" MaxWidth="500" 
+             Height="Auto" MinHeight="80">
     <Border CornerRadius="8" Background="#333333" BorderThickness="1" BorderBrush="#555555">
         <Grid Margin="10">
             <Grid.ColumnDefinitions>

@@ -56,16 +56,16 @@ namespace Infraestructura.Interceptors
 
         private async Task RegistrarErrorAsync(IInvocation invocation, Exception ex)
         {
+            var baseEx = ex.GetBaseException();
+
             // 1.Obtenemos el nombre de la clase(Modulo) y el método automáticamente
             string modulo = invocation.TargetType.Name;
             string metodo = invocation.Method.Name;
 
-            
+
             // 2. SELLO: Marcamos la excepción para que el Dispatcher no la repita
-            if (!ex.Data.Contains("Logged"))
-            {
-                ex.Data.Add("Logged", true);
-            }
+            if (!baseEx.Data.Contains("Logged")) baseEx.Data.Add("Logged", true);
+            if (!ex.Data.Contains("Logged")) ex.Data.Add("Logged", true);
 
             // 3. Guardamos en SQL mediante el servicio
             await _logService.LogErrorAsync(modulo, metodo, ex, "System_Auto");

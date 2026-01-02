@@ -79,30 +79,40 @@ namespace SmartPos
         {
             e.Handled = true;
 
-            // Buscamos si el sello existe en la excepción actual o en alguna interna
-            bool yaEstaRegistrado = false;
-            Exception exAux = e.Exception;
+            // BUSCAMOS EL SELLO EN TODA LA CADENA (Recursivo)
+            bool yaFueRegistrado = false;
+            Exception exCheck = e.Exception;
 
-            while (exAux != null)
+            while (exCheck != null)
             {
-                if (exAux.Data.Contains("Logged"))
+                if (exCheck.Data.Contains("Logged"))
                 {
-                    yaEstaRegistrado = true;
+                    yaFueRegistrado = true;
                     break;
                 }
-                exAux = exAux.InnerException;
+                exCheck = exCheck.InnerException;
             }
 
-            if (!yaEstaRegistrado)
+            if (!yaFueRegistrado)
             {
-                // Solo aquí registramos si nadie más lo hizo
+                // Si no tiene el sello, es un error de UI puro (no pasó por servicios)
                 var logService = App.ServiceProvider.GetRequiredService<ILogService>();
-                Task.Run(async () => await logService.LogErrorAsync("WPF_Global", "UI", e.Exception, "System"));
+                var exParaLog = e.Exception.GetBaseException();
+
+                Task.Run(async () => {
+                    await logService.LogErrorAsync("WPF_UI", "Global", exParaLog, "System");
+                });
             }
 
-            // Notificación siempre visible
+            // Mostrar siempre la notificación con tu servicio común
             var commonService = App.ServiceProvider.GetRequiredService<ICommonService>();
-            commonService.ShowError( e.Exception.Message);
+
+            string mensajeAmigable = "### ¡Ups! Algo no salió como esperábamos\n\n" +
+                             "El sistema ha experimentado un inconveniente técnico. " +
+                             "No te preocupes, el detalle ha sido enviado automáticamente al equipo de soporte.\n\n" +
+                             "**Acción:** Por favor, intenta realizar la operación nuevamente o contacta al administrador.";
+
+            commonService.ShowError(mensajeAmigable);
         }
 
     }
