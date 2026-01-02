@@ -28,7 +28,7 @@ namespace Infraestructura.Interceptors
             catch (Exception ex)
             {
                 // Manejo de métodos Síncronos
-                Task.Run(() => RegistrarErrorAsync(invocation, ex)).Wait();
+                RegistrarErrorAsync(invocation, ex).GetAwaiter().GetResult();
                 throw; // Re-lanzamos para que la UI sepa que algo falló
             }
         }
@@ -39,28 +39,36 @@ namespace Infraestructura.Interceptors
             {
                 await task;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await RegistrarErrorAsync(invocation, ex);
-                throw; // Re-lanzamos la excepción
+                // IMPORTANTE: Obtenemos la excepción real almacenada en la Task
+                // Si es una AggregateException (común en Tasks), tomamos la primera
+                var originalEx = task.Exception?.InnerException ?? task.Exception;
+
+                if (originalEx != null)
+                {
+                    await RegistrarErrorAsync(invocation, originalEx);
+                }
+
+                throw; // Al hacer 'throw' sin variable, preservamos el stack trace original
             }
         }
 
         private async Task RegistrarErrorAsync(IInvocation invocation, Exception ex)
         {
-            // Extraemos los nombres de forma automática mediante reflexión
+            // 1.Obtenemos el nombre de la clase(Modulo) y el método automáticamente
             string modulo = invocation.TargetType.Name;
             string metodo = invocation.Method.Name;
 
-            // Aquí puedes incluso capturar los parámetros si quieres ser más pro
-            // string parametros = string.Join(", ", invocation.Arguments);
+            
+            // 2. SELLO: Marcamos la excepción para que el Dispatcher no la repita
+            if (!ex.Data.Contains("Logged"))
+            {
+                ex.Data.Add("Logged", true);
+            }
 
-            await _logService.LogErrorAsync(
-                modulo,
-                metodo,
-                ex,
-                "System_Middleware_Auto"
-            );
+            // 3. Guardamos en SQL mediante el servicio
+            await _logService.LogErrorAsync(modulo, metodo, ex, "System_Auto");
         }
     }
 }

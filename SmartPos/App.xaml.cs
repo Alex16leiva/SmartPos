@@ -78,6 +78,32 @@ namespace SmartPos
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             e.Handled = true;
+
+            // Buscamos si el sello existe en la excepción actual o en alguna interna
+            bool yaEstaRegistrado = false;
+            Exception exAux = e.Exception;
+
+            while (exAux != null)
+            {
+                if (exAux.Data.Contains("Logged"))
+                {
+                    yaEstaRegistrado = true;
+                    break;
+                }
+                exAux = exAux.InnerException;
+            }
+
+            if (!yaEstaRegistrado)
+            {
+                // Solo aquí registramos si nadie más lo hizo
+                var logService = App.ServiceProvider.GetRequiredService<ILogService>();
+                Task.Run(async () => await logService.LogErrorAsync("WPF_Global", "UI", e.Exception, "System"));
+            }
+
+            // Notificación siempre visible
+            var commonService = App.ServiceProvider.GetRequiredService<ICommonService>();
+            commonService.ShowError( e.Exception.Message);
         }
+
     }
 }
