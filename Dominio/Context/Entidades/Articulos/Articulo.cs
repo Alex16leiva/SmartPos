@@ -63,5 +63,15 @@ namespace Dominio.Context.Entidades.Articulos
         public bool Inactivo { get; set; }
 
         public virtual ICollection<InventarioMovimiento> InventarioMovimientos { get; set; }
+
+        public void ActualizarCosto(decimal costo)
+        {
+            if (Costo == costo || costo <= 0)
+            {
+                return;
+            }
+            UltimoCosto = Costo;
+            Costo = costo;
+        }
     }
 }

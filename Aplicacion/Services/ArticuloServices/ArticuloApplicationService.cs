@@ -114,17 +114,11 @@ namespace Aplicacion.Services.ArticuloServices
                 return new ArticulosDTO { Message = $"No se encontró el artículo con código {request.Articulo.ArticuloId}." };
             }
 
-            // 2. Lógica de Negocio: Detectar cambio de costo para el histórico
-            if (articuloExistente.Costo != request.Articulo.Costo)
-            {
-                articuloExistente.UltimoCosto = articuloExistente.Costo;
-            }
-
             // 3. Mapeo de cambios desde el DTO a la Entidad
             articuloExistente.Descripcion = request.Articulo.Descripcion;
             articuloExistente.DescripcionExtendida = request.Articulo.DescripcionExtendida;
             articuloExistente.Precio = request.Articulo.Precio;
-            articuloExistente.Costo = request.Articulo.Costo;
+            articuloExistente.ActualizarCosto(request.Articulo.Costo);
             // Nota: La cantidad usualmente se maneja por movimientos, 
             // pero para esta edición directa la actualizamos:
             articuloExistente.Cantidad = request.Articulo.Cantidad;
@@ -161,8 +155,7 @@ namespace Aplicacion.Services.ArticuloServices
             {
                 cantidadReal = Math.Abs(request.InventarioMovimiento.CantidadMovimiento); // Aseguramos que entrada sea positiva
                 articulo.UltimoRecibo = DateTime.Now;
-                articulo.UltimoCosto = articulo.Costo;
-                articulo.Costo = request.InventarioMovimiento.CostoUnitario;
+                articulo.ActualizarCosto(request.InventarioMovimiento.CostoUnitario);
             }
 
 
