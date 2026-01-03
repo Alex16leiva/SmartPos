@@ -5,6 +5,7 @@ using Infraestructura.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.Comunes.Extensions;
 using SmartPos.ViewModels;
@@ -20,6 +21,8 @@ namespace SmartPos
 
         protected override void OnStartup(StartupEventArgs e)
         {
+
+
             base.OnStartup(e);
 
             var serviceCollection = new ServiceCollection();
