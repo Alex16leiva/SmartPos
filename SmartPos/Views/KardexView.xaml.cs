@@ -27,7 +27,7 @@ namespace SmartPos.Views
             DgKardex.ItemsSource = data.InventarioMovimientos;
 
             // El último saldo en la lista (que está ordenada por fecha DESC) es el stock actual
-            TxtStockActual.Text = data.InventarioMovimientos.FirstOrDefault()?.CantidadNueva.ToString("N2") ?? "0.00";            
+            TxtStockActual.Text = data.Articulo.Cantidad.ToString("N2") ?? "0.00";            
         }
     }
 }

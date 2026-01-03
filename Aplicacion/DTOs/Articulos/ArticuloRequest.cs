@@ -11,6 +11,7 @@ namespace SmartPos.DTOs.Articulos
 
     public class ArticuloResponse : ResponseBase
     {
+        public ArticulosDTO Articulo { get; set; }
         public List<InventarioMovimientoDTO> InventarioMovimientos { get; set; }
     }
 }

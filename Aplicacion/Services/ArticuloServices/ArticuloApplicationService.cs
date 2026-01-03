@@ -196,7 +196,8 @@ namespace Aplicacion.Services.ArticuloServices
 
             return new ArticuloResponse
             {
-                InventarioMovimientos = inventarioMovimientosDto
+                InventarioMovimientos = inventarioMovimientosDto,
+                Articulo = MapArticulo(articulo)
             };
         }
 
@@ -218,7 +219,9 @@ namespace Aplicacion.Services.ArticuloServices
                 InventarioMovimientoId = item.InventarioMovimientoId,
                 Notas = item.Notas,
                 Referencia = item.Referencia,
-                TipoMovimiento = item.TipoMovimiento
+                TipoMovimiento = item.TipoMovimiento,
+                ModificadoPor = item.ModificadoPor,
+                EsEntrada = item.TipoMovimiento == "ENTRADA"
             };
         }
     }

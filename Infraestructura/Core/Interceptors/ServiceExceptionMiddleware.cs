@@ -14,22 +14,29 @@ namespace Infraestructura.Interceptors
 
         public void Intercept(IInvocation invocation)
         {
+            invocation.Proceed();
+
+            var method = invocation.MethodInvocationTarget;
+            bool isAsyncTask = typeof(Task).IsAssignableFrom(method.ReturnType);
+
+            if (isAsyncTask)
+            {
+                // Usamos dynamic para que invoque la versión genérica correcta en tiempo de ejecución
+                invocation.ReturnValue = HandleAsyncWithResult((dynamic)invocation.ReturnValue, invocation);
+            }
+        }
+
+        // Versión para métodos que devuelven Task<T> (¡Esta es la que arregla tu error!)
+        private async Task<T> HandleAsyncWithResult<T>(Task<T> task, IInvocation invocation)
+        {
             try
             {
-                // Ejecuta el método original del servicio
-                invocation.Proceed();
-
-                // Manejo de métodos Asíncronos (Task)
-                if (invocation.ReturnValue is Task task)
-                {
-                    invocation.ReturnValue = HandleAsync(task, invocation);
-                }
+                return await task;
             }
             catch (Exception ex)
             {
-                // Manejo de métodos Síncronos
-                RegistrarErrorAsync(invocation, ex).GetAwaiter().GetResult();
-                throw; // Re-lanzamos para que la UI sepa que algo falló
+                await RegistrarErrorAsync(invocation, ex);
+                throw;
             }
         }
 

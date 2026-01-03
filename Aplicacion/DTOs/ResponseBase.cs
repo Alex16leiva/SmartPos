@@ -8,7 +8,7 @@ namespace Aplicacion.DTOs
         public string? ValidationErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
         public DateTime? FechaTransaccion { get; set; }
-
+        public string? ModificadoPor { get; set; }
         public bool HasValidationMessage()
         {
             return Message.HasValue();

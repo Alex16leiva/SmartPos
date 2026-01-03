@@ -11,5 +11,6 @@
         public string TipoMovimiento { get; set; } = string.Empty; // Ejemplo: "Entrada", "Salida", "Ajuste"
         public string? Referencia { get; set; } // Puede ser un número de factura, orden de compra, etc.
         public string? Notas { get; set; }
+        public bool EsEntrada { get; set; }
     }
 }

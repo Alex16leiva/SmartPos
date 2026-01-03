@@ -21,7 +21,7 @@
             <TextBlock Text="Artículo:" FontWeight="Bold" FontSize="16"/>
             <TextBlock x:Name="TxtNombreArticulo" Text="Nombre del Producto" FontSize="16" Margin="10,0,20,0"/>
             <TextBlock Text="Stock Actual:" FontWeight="Bold" FontSize="16"/>
-            <TextBlock x:Name="TxtStockActual" Text="0.00" FontSize="16" Foreground="Cyan" Margin="10,0,0,0"/>
+            <TextBlock x:Name="TxtStockActual" Text="0.00" FontSize="16" Margin="10,0,0,0"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1" x:Name="DgKardex" 
@@ -34,6 +34,7 @@
                 <DataGridTextColumn Header="Fecha" Binding="{Binding FechaTransaccion, StringFormat='dd/MM/yyyy HH:mm'}" Width="150"/>
                 <DataGridTextColumn Header="Tipo" Binding="{Binding TipoMovimiento}" Width="120"/>
                 <DataGridTextColumn Header="Referencia" Binding="{Binding Referencia}" Width="120"/>
+                <DataGridTextColumn Header="Costo unitario" Binding="{Binding CostoUnitario}" Width="120"/>
 
                 <DataGridTemplateColumn Header="Cantidad" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
@@ -59,7 +60,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Saldo Final" Binding="{Binding SaldoDespues, StringFormat='N2'}" Width="100">
+                <DataGridTextColumn Header="Saldo Final" Binding="{Binding CantidadNueva, StringFormat='N2'}" Width="100">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
@@ -68,7 +69,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn Header="Usuario" Binding="{Binding Usuario}" Width="*"/>
+                <DataGridTextColumn Header="Usuario" Binding="{Binding ModificadoPor}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
 
