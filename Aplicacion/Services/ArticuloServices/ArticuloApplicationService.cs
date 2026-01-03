@@ -183,5 +183,43 @@ namespace Aplicacion.Services.ArticuloServices
 
             return request.Articulo;
         }
+    
+        public async Task<ArticuloResponse> ObtenerKardexArticuloAsync (string articuloId)
+        {
+            List<string> includes = ["InventarioMovimiento"];
+            var articulo = await _genericRepository.GetSingleAsync<Articulo>(a =>
+                a.ArticuloId == articuloId, includes);
+
+            if (articulo.IsNull()) return new ArticuloResponse { Message = $"Articulo { articuloId } no encontrado" };
+
+            var inventarioMovimientosDto = MapearInventarioMovimientosDto(articulo.InventarioMovimiento.ToList());
+
+            return new ArticuloResponse
+            {
+                InventarioMovimientos = inventarioMovimientosDto
+            };
+        }
+
+        private List<InventarioMovimientoDTO> MapearInventarioMovimientosDto(List<InventarioMovimiento> inventarioMovimientos)
+        {
+            return [.. inventarioMovimientos.Select(item => MapearInventarioMovimientoDto(item))];
+        }
+
+        private static InventarioMovimientoDTO MapearInventarioMovimientoDto(InventarioMovimiento item)
+        {
+            return new InventarioMovimientoDTO
+            {
+                ArticuloId = item.ArticuloId,
+                CantidadAnterior = item.CantidadAnterior,
+                CantidadMovimiento = item.CantidadMovimiento,
+                CantidadNueva = item.CantidadNueva,
+                CostoUnitario = item.CostoUnitario,
+                FechaTransaccion = item.FechaTransaccion,
+                InventarioMovimientoId = item.InventarioMovimientoId,
+                Notas = item.Notas,
+                Referencia = item.Referencia,
+                TipoMovimiento = item.TipoMovimiento
+            };
+        }
     }
 }

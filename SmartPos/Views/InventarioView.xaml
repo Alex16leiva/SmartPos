@@ -66,6 +66,19 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <DataGridTemplateColumn Header="Acciones" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Ver Kardex" 
+                            Click="BtnKardex_Click" 
+                            Style="{StaticResource MahApps.Styles.Button.Flat}"
+                            Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                            FontWeight="Bold"
+                            Cursor="Hand"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <DataGridTextColumn Header="Código" Binding="{Binding ArticuloId}" Width="100"/>
                     <DataGridTextColumn Header="Descripcion" Binding="{Binding Descripcion}" Width="*"/>
                     <DataGridTextColumn Header="Descripcion Extendida" Binding="{Binding DescripcionExtendida}" Width="*"/>

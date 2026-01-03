@@ -1,9 +1,11 @@
 ﻿using Dominio.Core;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dominio.Context.Entidades.Articulos
 {
     public class InventarioMovimiento : Entity
     {
+        [ForeignKey("Articulo")]
         public int InventarioMovimientoId { get; set; }
         public string ArticuloId { get; set; } = string.Empty;
         public decimal CantidadAnterior { get; set; }

@@ -61,8 +61,8 @@ namespace Dominio.Context.Entidades.Articulos
         public string? ImagenRuta { get; set; }
         public string? Notas { get; set; }
         public bool Inactivo { get; set; }
-
-        public virtual ICollection<InventarioMovimiento> InventarioMovimientos { get; set; }
+        [ForeignKey("ArticuloId")]
+        public virtual ICollection<InventarioMovimiento> InventarioMovimiento { get; set; }
 
         public void ActualizarCosto(decimal costo)
         {

@@ -21,7 +21,7 @@ namespace Infraestructura.Context.Mapping.Articulos
             builder.Property(e => e.Notas).HasMaxLength(500);
             // Mapeo de relaciones
             builder.HasOne(e => e.Articulo)
-                .WithMany(a => a.InventarioMovimientos)
+                .WithMany(a => a.InventarioMovimiento)
                 .HasForeignKey(e => e.ArticuloId);
         }
     }
