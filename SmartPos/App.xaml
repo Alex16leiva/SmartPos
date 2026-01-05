@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SmartPos"
              xmlns:views="clr-namespace:SmartPos.Views"
+             xmlns:seguridad="clr-namespace:SmartPos.Views.Seguridad"
              xmlns:viewModels="clr-namespace:SmartPos.ViewModels"
              DispatcherUnhandledException="Application_DispatcherUnhandledException">
    
@@ -15,6 +16,9 @@
             </ResourceDictionary.MergedDictionaries>
             <DataTemplate DataType="{x:Type viewModels:InventarioViewModel}">
                 <views:InventarioView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:SeguridadViewModel}">
+                <seguridad:SeguridadView  />
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

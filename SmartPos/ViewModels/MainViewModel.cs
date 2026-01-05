@@ -22,7 +22,9 @@ namespace SmartPos.ViewModels
             MenuItems = new HamburgerMenuItemCollection
             {
                 new HamburgerMenuIconItem { Icon = "📦", Label = "Inventario", Tag = "Inventario" },
-                new HamburgerMenuIconItem { Icon = "🛒", Label = "Ventas", Tag = "Ventas" }
+                new HamburgerMenuIconItem { Icon = "🛒", Label = "Ventas", Tag = "Ventas" },
+                new HamburgerMenuIconItem { Icon = "🔒", Label = "Seguridad", Tag = "Seguridad" },
+
             };
 
             // Por defecto, iniciamos en Inventario
@@ -48,6 +50,9 @@ namespace SmartPos.ViewModels
             {
                 case "Inventario":
                     CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<InventarioViewModel>(_serviceProvider);
+                    break;
+                case "Seguridad":
+                    CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<SeguridadViewModel>(_serviceProvider);
                     break;
                 case "Ventas":
                     // CurrentView = _serviceProvider.GetRequiredService<VentasViewModel>();

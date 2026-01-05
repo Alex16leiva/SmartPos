@@ -219,7 +219,7 @@ namespace SmartPos.ViewModels
             
                 var request = new ArticuloRequest
                 {
-                    QueryInfo = ObtenerQueryInfoUsuarios()
+                    QueryInfo = ObtenerQueryInfoArticulo()
                 };
 
             var result = _articuloApplicationService.ObtenerArticulos(request);
@@ -234,7 +234,7 @@ namespace SmartPos.ViewModels
             IsBusy = false; // Ocultar el ProgressRing
         }
 
-        private QueryInfo ObtenerQueryInfoUsuarios()
+        private QueryInfo ObtenerQueryInfoArticulo()
         {
             var queryInfo = new QueryInfo
             {

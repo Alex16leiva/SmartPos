@@ -2,21 +2,20 @@
 using Aplicacion.DTOs;
 using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Helpers;
-using AutoMapper;
 using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
 using Dominio.Core.Extensions;
 using Infraestructura.Context;
-using Infraestructura.Core.Jwtoken;
+using System.Threading.Tasks;
 
 namespace Aplicacion.Services
 {
-    public class SecurityAplicationService : BaseDisposable
+    public class SecurityApplicationService : BaseDisposable, ISecurityApplicationService
     {
         private readonly IGenericRepository<IDataContext> _genericRepository;
         
-        public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository)
+        public SecurityApplicationService(IGenericRepository<IDataContext> genericRepository)
         {
             _genericRepository = genericRepository;
         }
@@ -230,10 +229,10 @@ namespace Aplicacion.Services
             return new RolDTO();
         }
 
-        public List<RolDTO> ObtenerRoles()
+        public async Task<List<RolDTO>> ObtenerRoles()
         {
             var includes = new List<string> { "Permisos" };
-            var roles = _genericRepository.GetAll<Rol>(includes);
+            var roles = await _genericRepository.GetAllAsync<Rol>(includes);
 
             return roles.Select(qry =>
             new RolDTO

@@ -1,8 +1,6 @@
 ﻿using Aplicacion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
@@ -12,10 +10,10 @@ namespace SmartPos.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
-        private readonly SecurityAplicationService _securityAplicationService;
+        private readonly ISecurityApplicationService _securityAplicationService;
         private readonly ICommonService _commonService;
 
-        public LoginViewModel(SecurityAplicationService securityAplicationService,
+        public LoginViewModel(ISecurityApplicationService securityAplicationService,
             ICommonService commonService)
         {
             _securityAplicationService = securityAplicationService;

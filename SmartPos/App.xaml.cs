@@ -21,8 +21,6 @@ namespace SmartPos
 
         protected override void OnStartup(StartupEventArgs e)
         {
-
-
             base.OnStartup(e);
 
             var serviceCollection = new ServiceCollection();
@@ -63,14 +61,16 @@ namespace SmartPos
             services.AddSingleton<MainViewModel>();
             services.AddTransient<InventarioViewModel>();
             services.AddTransient<LoginViewModel>();
+            services.AddTransient<SeguridadViewModel>();
 
             // 6. Vistas
             services.AddTransient<Views.MainWindow>();
             services.AddTransient<LoginView>();
 
+
             // 7. ApplicationServices
             services.AddSingleton<ICommonService, CommonService>();
-            services.AddTransient<SecurityAplicationService>();
+            services.AddTransient<ISecurityApplicationService, SecurityApplicationService>();
             services.AddTransient<IArticuloApplicationService, ArticuloApplicationService>();
             services.AddTransient<ILogService, LogService>();
 
