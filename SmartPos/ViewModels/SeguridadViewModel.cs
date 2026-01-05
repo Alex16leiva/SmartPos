@@ -5,6 +5,7 @@ using Aplicacion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Core.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,12 +14,13 @@ namespace SmartPos.ViewModels
 {
     public partial class SeguridadViewModel : ObservableObject
     {
-        private readonly ISecurityApplicationService _securityService;
+        // Inyectamos la fábrica, no el servicio directamente
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommonService _commonService;
 
-        public SeguridadViewModel(ISecurityApplicationService securityService, ICommonService commonService)
+        public SeguridadViewModel(IServiceScopeFactory scopeFactory, ICommonService commonService)
         {
-            _securityService = securityService;
+            _scopeFactory = scopeFactory;
             _commonService = commonService;
 
             _usuarios = new ObservableCollection<UsuarioDTO>();
@@ -87,19 +89,24 @@ namespace SmartPos.ViewModels
             IsBusy = true;
             try
             {
-                // Carga de Roles (Asíncrono en tu backend)
-                var rolesList = await _securityService.ObtenerRoles();
-                Roles = new ObservableCollection<RolDTO>(rolesList);
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var securityService = scope.ServiceProvider.GetRequiredService<ISecurityApplicationService>();
+                    // Carga de Roles (Asíncrono en tu backend)
+                    var rolesList = await securityService.ObtenerRoles();
+                    Roles = new ObservableCollection<RolDTO>(rolesList);
 
-                // Carga de Usuarios (Síncrono en tu backend, lo envolvemos en Task)
-                await Task.Run(() => {
-                    var userRequest = new GetUserRequest
+                    // Carga de Usuarios (Síncrono en tu backend, lo envolvemos en Task)
+                    await Task.Run(() =>
                     {
-                        QueryInfo = ObtenerQueryInfoArticulo()
-                    };
-                    var result = _securityService.ObtenerUsuario(userRequest);
-                    Usuarios = new ObservableCollection<UsuarioDTO>(result.Items);
-                });
+                        var userRequest = new GetUserRequest
+                        {
+                            QueryInfo = ObtenerQueryInfoArticulo()
+                        };
+                        var result = securityService.ObtenerUsuario(userRequest);
+                        Usuarios = new ObservableCollection<UsuarioDTO>(result.Items);
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -112,21 +119,25 @@ namespace SmartPos.ViewModels
         partial void OnRolSeleccionadoChanged(RolDTO value)
         {
             if (value == null) { MatrizPermisos.Clear(); return; }
-
-            var pantallas = _securityService.ObtenerPantallas();
-
-            // Replicamos el mapeo que haces en el DataGrid de React (screens.map...)
-            var matriz = pantallas.Select(s => new PermisosDTO
+            using (var scope = _scopeFactory.CreateScope())
             {
-                PantallaId = s.PantallaId,
-                RolId = value.RolId,
-                // Buscamos si el rol ya tiene este permiso
-                Ver = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Ver ?? false,
-                Editar = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Editar ?? false,
-                Eliminar = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Eliminar ?? false
-            }).ToList();
+                var securityService = scope.ServiceProvider.GetRequiredService<ISecurityApplicationService>();
+                var pantallas = securityService.ObtenerPantallas();
 
-            MatrizPermisos = new ObservableCollection<PermisosDTO>(matriz);
+
+                // Replicamos el mapeo que haces en el DataGrid de React (screens.map...)
+                var matriz = pantallas.Select(s => new PermisosDTO
+                {
+                    PantallaId = s.PantallaId,
+                    RolId = value.RolId,
+                    // Buscamos si el rol ya tiene este permiso
+                    Ver = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Ver ?? false,
+                    Editar = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Editar ?? false,
+                    Eliminar = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Eliminar ?? false
+                }).ToList();
+
+                MatrizPermisos = new ObservableCollection<PermisosDTO>(matriz);
+            }
         }
 
         [RelayCommand]
@@ -137,17 +148,21 @@ namespace SmartPos.ViewModels
             IsBusy = true;
             try
             {
-                // Mismo objeto request que usas en handleSavePermissions de React
-                var request = new EdicionPermisosRequest
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    RolId = RolSeleccionado.RolId,
-                    Permisos = MatrizPermisos.ToList(),
-                    RequestUserInfo = _commonService.GetRequestInfo()
-                };
+                    var securityService = scope.ServiceProvider.GetRequiredService<ISecurityApplicationService>();
+                    // Mismo objeto request que usas en handleSavePermissions de React
+                    var request = new EdicionPermisosRequest
+                    {
+                        RolId = RolSeleccionado.RolId,
+                        Permisos = MatrizPermisos.ToList(),
+                        RequestUserInfo = _commonService.GetRequestInfo()
+                    };
 
-                await Task.Run(() => _securityService.EdicionPermisos(request));
-                _commonService.ShowSuccess("Permisos actualizados correctamente");
-                await LoadDataAsync();
+                    await Task.Run(() => securityService.EdicionPermisos(request));
+                    _commonService.ShowSuccess("Permisos actualizados correctamente");
+                }
+                    await LoadDataAsync();
             }
             catch (Exception ex) { _commonService.ShowError(ex.Message); }
             finally { IsBusy = false; }
@@ -201,18 +216,22 @@ namespace SmartPos.ViewModels
             try
             {
                 UsuarioSeleccionado.EditarContrasena = UsuarioSeleccionado.Contrasena.HasValue();
-                var request = new EdicionUsuarioRequest
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    Usuario = UsuarioSeleccionado,
-                    RequestUserInfo = _commonService.GetRequestInfo()
-                };
+                    var securityService = scope.ServiceProvider.GetRequiredService<ISecurityApplicationService>();
+                    var request = new EdicionUsuarioRequest
+                    {
+                        Usuario = UsuarioSeleccionado,
+                        RequestUserInfo = _commonService.GetRequestInfo()
+                    };
 
-                
-                if (IsNuevoUsuario) _securityService.CrearUsuario(request);
-                else _securityService.EditarUsuario(request);
-            
-                _commonService.ShowSuccess("Operación exitosa");
-                IsNuevoUsuario = false;
+
+                    if (IsNuevoUsuario) securityService.CrearUsuario(request);
+                    else securityService.EditarUsuario(request);
+
+                    _commonService.ShowSuccess("Operación exitosa");
+                    IsNuevoUsuario = false;
+                }
                 await LoadDataAsync();
             }
             catch (Exception ex)

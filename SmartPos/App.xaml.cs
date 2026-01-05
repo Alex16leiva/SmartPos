@@ -47,15 +47,19 @@ namespace SmartPos
 
 
             string connectionString = configuration.GetConnectionString("conectionDataBase");
-            // 2. Base de Datos (Transient para que cada repo tenga su propio context)
-            services.AddDbContext<SmartPostDbContext>(options => options.UseSqlServer(connectionString), 
-                ServiceLifetime.Transient);
+            // 2. Base de Datos: Cambiamos a Scoped
+            services.AddDbContext<SmartPostDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+                // Mantenemos el NoTracking por defecto para máxima limpieza
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            }, ServiceLifetime.Scoped);
 
-            // 3. Mapeo de Interfaz (DEBE SER TRANSIENT TAMBIÉN)
-            services.AddTransient<IDataContext>(sp => sp.GetRequiredService<SmartPostDbContext>());
+            // 3. Mapeo de Interfaz: Scoped
+            services.AddScoped<IDataContext>(sp => sp.GetRequiredService<SmartPostDbContext>());
 
-            // 4. Repositorios (DEBE SER TRANSIENT TAMBIÉN)
-            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            // 4. Repositorios: Scoped
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // 5. ViewModels
             services.AddSingleton<MainViewModel>();
@@ -70,9 +74,9 @@ namespace SmartPos
 
             // 7. ApplicationServices
             services.AddSingleton<ICommonService, CommonService>();
-            services.AddTransient<ISecurityApplicationService, SecurityApplicationService>();
-            services.AddTransient<IArticuloApplicationService, ArticuloApplicationService>();
-            services.AddTransient<ILogService, LogService>();
+            services.AddScoped<ISecurityApplicationService, SecurityApplicationService>();
+            services.AddScoped<IArticuloApplicationService, ArticuloApplicationService>();
+            services.AddScoped<ILogService, LogService>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
             services.AddApplicationServicesWithInterceptors();

@@ -133,14 +133,14 @@ namespace Infraestructura.Context
         public TEntity GetSingle<TEntity>(Expression<Func<TEntity, bool>> predicate) 
             where TEntity : Entity
         {
-            return GetSet<TEntity>().AsNoTracking().FirstOrDefault(predicate);
+            return GetSet<TEntity>().FirstOrDefault(predicate);
         }
 
         /// <inheritdoc/>
         public async Task<TEntity> GetSingleAsync<TEntity>(Expression<Func<TEntity, bool>> predicate) 
             where TEntity : Entity
         {
-            return await GetSet<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate);
+            return await GetSet<TEntity>().FirstOrDefaultAsync(predicate);
         }
 
 
@@ -148,7 +148,7 @@ namespace Infraestructura.Context
         public TEntity GetSingle<TEntity>(Expression<Func<TEntity, bool>> predicate, List<string> includes)
             where TEntity : Entity
         {
-            IQueryable<TEntity> items = GetSet<TEntity>().AsNoTracking();
+            IQueryable<TEntity> items = GetSet<TEntity>();
 
             if (includes.HasItems())
             {
@@ -163,7 +163,7 @@ namespace Infraestructura.Context
         public async Task<TEntity> GetSingleAsync<TEntity>(Expression<Func<TEntity, bool>> predicate, List<string> includes)
             where TEntity : Entity
         {
-            IQueryable<TEntity> items = GetSet<TEntity>().AsNoTracking();
+            IQueryable<TEntity> items = GetSet<TEntity>();
 
             if (includes.HasItems())
             {
@@ -178,21 +178,21 @@ namespace Infraestructura.Context
         public IEnumerable<TEntity> GetFiltered<TEntity>(Expression<Func<TEntity, bool>> predicate)
             where TEntity : Entity
         {
-            return GetSet<TEntity>().AsNoTracking().Where(predicate).ToList();
+            return GetSet<TEntity>().Where(predicate).ToList();
         }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<TEntity>> GetFilteredAsync<TEntity>(Expression<Func<TEntity, bool>> predicate)
             where TEntity : Entity
         {
-            return await GetSet<TEntity>().AsNoTracking().Where(predicate).ToListAsync();
+            return await GetSet<TEntity>().Where(predicate).ToListAsync();
         }
 
         /// <inheritdoc/>
         public IEnumerable<TEntity> GetFiltered<TEntity>(Expression<Func<TEntity, bool>> predicate, List<string> includes)
             where TEntity : Entity
         {
-            IQueryable<TEntity> items = GetSet<TEntity>().AsNoTracking();
+            IQueryable<TEntity> items = GetSet<TEntity>();
             if (includes.HasItems())
             {
                 //Adding includes to filter
@@ -206,7 +206,7 @@ namespace Infraestructura.Context
         public async Task<IEnumerable<TEntity>> GetFilteredAsync<TEntity>(Expression<Func<TEntity, bool>> predicate, List<string> includes)
             where TEntity : Entity
         {
-            IQueryable<TEntity> items = GetSet<TEntity>().AsNoTracking();
+            IQueryable<TEntity> items = GetSet<TEntity>();
             if (includes.HasItems())
             {
                 //Adding includes to filter
@@ -220,8 +220,8 @@ namespace Infraestructura.Context
             where TEntity : Entity
         {
             IQueryable<TEntity> items = !string.IsNullOrWhiteSpace(filterDef.Filtro)
-                                            ? GetSet<TEntity>().AsNoTracking().Where(filterDef.Filtro, filterDef.Valores)
-                                            : GetSet<TEntity>().AsNoTracking();
+                                            ? GetSet<TEntity>().Where(filterDef.Filtro, filterDef.Valores)
+                                            : GetSet<TEntity>();
 
             if (filterDef.Includes.HasItems())
             {
@@ -262,8 +262,8 @@ namespace Infraestructura.Context
             where TEntity : Entity
         {
             IQueryable<TEntity> items = !string.IsNullOrWhiteSpace(filterDef.Filtro)
-                                            ? GetSet<TEntity>().AsNoTracking().Where(filterDef.Filtro, filterDef.Valores)
-                                            : GetSet<TEntity>().AsNoTracking();
+                                            ? GetSet<TEntity>().Where(filterDef.Filtro, filterDef.Valores)
+                                            : GetSet<TEntity>();
 
             if (filterDef.Includes.HasItems())
             {
