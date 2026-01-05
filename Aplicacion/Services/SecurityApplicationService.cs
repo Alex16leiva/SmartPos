@@ -265,7 +265,8 @@ namespace Aplicacion.Services
                 RolId = qry.RolId,
                 UsuarioId = qry.UsuarioId,
                 FechaTransaccion = qry.FechaTransaccion,
-                Activo = qry.Activo
+                Activo = qry.Activo,
+                ModificadoPor = qry.ModificadoPor,
             };
         }
 

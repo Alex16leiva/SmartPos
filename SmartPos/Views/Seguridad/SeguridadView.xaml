@@ -56,7 +56,10 @@
                                 </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Usuario Id" Binding="{Binding UsuarioId}" Width="120"/>
                                 <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="Apellido" Binding="{Binding Apellido}" Width="*"/>
                                 <DataGridTextColumn Header="Rol" Binding="{Binding RolId}" Width="150"/>
+                                <DataGridTextColumn Header="Creado Por" Binding="{Binding ModificadoPor}" Width="*"/>
+                                <DataGridTextColumn Header="Fecha Modificacion" Binding="{Binding FechaTransaccion}" Width="*"/>
                                 <DataGridTemplateColumn Header="Estado" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -77,10 +80,10 @@
                           Margin="0,0,20,0"/>
                             <Button Command="{Binding AnteriorPaginaCommand}" Content="◀" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
                             <TextBlock VerticalAlignment="Center" Margin="10,0">
-                    <Run Text="Página "/>
-                    <Run Text="{Binding PaginaActual}" FontWeight="Bold"/>
-                    <Run Text=" de "/>
-                    <Run Text="{Binding TotalPaginas}" FontWeight="Bold"/>
+                                <Run Text="Página "/>
+                                <Run Text="{Binding PaginaActual}" FontWeight="Bold"/>
+                                <Run Text=" de "/>
+                                <Run Text="{Binding TotalPaginas}" FontWeight="Bold"/>
                             </TextBlock>
                             <Button Command="{Binding SiguientePaginaCommand}" Content="▶" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
                         </StackPanel>
