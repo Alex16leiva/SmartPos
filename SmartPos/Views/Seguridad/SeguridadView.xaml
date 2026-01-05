@@ -26,9 +26,10 @@
                              mah:TextBoxHelper.ButtonContent="🔍"
                              Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource MahApps.Styles.TextBox.Search}"/>
-                            <Button Content="NUEVO USUARIO" HorizontalAlignment="Right" 
-                            Style="{StaticResource MahApps.Styles.Button.Flat}"
-                            Background="#1976D2" Foreground="White" Padding="15,5"/>
+                            <Button Content="NUEVO USUARIO" HorizontalAlignment="Right"
+                                Command="{Binding NuevoUsuarioCommand}"    
+                                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                Background="#1976D2" Foreground="White" Padding="15,5"/>
                         </DockPanel>
 
                         <DataGrid Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
@@ -36,7 +37,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Usuario Id" Binding="{Binding UsuarioId}" Width="120"/>
                                 <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
-                                <DataGridTextColumn Header="Rol" Binding="{Binding RolNombre}" Width="150"/>
+                                <DataGridTextColumn Header="Rol" Binding="{Binding RolId}" Width="150"/>
                                 <DataGridTemplateColumn Header="Estado" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -115,5 +116,56 @@
 
             </mah:MetroTabControl>
         </Grid>
+
+
+        <!--Flyout para gestión de usuarios-->
+        <mah:Flyout IsOpen="{Binding IsEditFlyoutUsuarioOpen}" 
+                        Header="Gestión de Usuario" 
+                        Position="Right" Width="400" 
+                        >
+            <Grid Margin="15">
+                <StackPanel>
+                    <TextBlock Text="DATOS DEL USUARIO" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                    <TextBox mah:TextBoxHelper.Watermark="Usuario ID" 
+                                 Text="{Binding UsuarioSeleccionado.UsuarioId}" 
+                                 IsEnabled="{Binding EsNuevoUsuario}" 
+                                 Margin="0,0,0,10"/>
+
+                    <TextBox mah:TextBoxHelper.Watermark="Nombre" 
+                                 Text="{Binding UsuarioSeleccionado.Nombre}" 
+                                 Margin="0,0,0,10"/>
+
+                    <TextBox mah:TextBoxHelper.Watermark="Apellido" 
+                                 Text="{Binding UsuarioSeleccionado.Apellido}" 
+                                 Margin="0,0,0,10"/>
+
+                    <PasswordBox mah:TextBoxHelper.Watermark="Nueva Contraseña" 
+                                     Margin="0,0,0,5"
+                                     x:Name="PasswordCtrl"/>
+                    <TextBlock Text="* Dejar vacío para mantener contraseña actual" 
+                                   FontSize="10" Foreground="Gray" Margin="0,0,0,15"
+                                   Visibility="{Binding EsNuevoUsuario, Converter={StaticResource InverseBoolToVisConverter}}"/>
+
+                    <ComboBox mah:TextBoxHelper.Watermark="Seleccionar Rol"
+                                  ItemsSource="{Binding Roles}"
+                                  SelectedValue="{Binding UsuarioSeleccionado.RolId}"
+                                  SelectedValuePath="RolId"
+                                  DisplayMemberPath="Descripcion"
+                                  Margin="0,0,0,15"/>
+
+                    <CheckBox Content="Activo" IsChecked="{Binding UsuarioSeleccionado.Activo}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="CANCELAR" Command="{Binding CancelarCommand}" Margin="0,0,10,0"/>
+                        <Button Content="GUARDAR" 
+                            Style="{StaticResource MahApps.Styles.Button.Flat}"
+                            Command="{Binding GuardarUsuarioCommand}"
+                            CommandParameter="{Binding ElementName=PasswordCtrl}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </mah:Flyout>
+
     </Grid>
 </UserControl>

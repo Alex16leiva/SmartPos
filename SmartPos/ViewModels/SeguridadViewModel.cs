@@ -1,4 +1,5 @@
 ﻿using Aplicacion.DTOs;
+using Aplicacion.DTOs.Articulos;
 using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -35,6 +36,9 @@ namespace SmartPos.ViewModels
         private CancellationTokenSource _searchCts;
         [ObservableProperty] private int _paginaActual = 1;
         [ObservableProperty] private int _registrosPorPagina = 10;
+        [ObservableProperty] private UsuarioDTO _usuarioSeleccionado;
+        [ObservableProperty] private bool _isNuevoUsuario;
+        [ObservableProperty] private bool _isEditFlyoutUsuarioOpen;
 
         async partial void OnTextoBusquedaChanged(string value)
         {
@@ -146,6 +150,64 @@ namespace SmartPos.ViewModels
             }
             catch (Exception ex) { _commonService.ShowError(ex.Message); }
             finally { IsBusy = false; }
+        }
+
+        [RelayCommand]
+        private void NuevoUsuario()
+        {
+            // Preparamos un DTO vacío para el formulario
+            UsuarioSeleccionado = new UsuarioDTO
+            {
+                UsuarioId = string.Empty,
+                Nombre = string.Empty,
+                RolId = string.Empty,
+                Contrasena = string.Empty
+            };
+            IsNuevoUsuario = true;
+            IsEditFlyoutUsuarioOpen = true;
+        }
+
+        [RelayCommand]
+        private async Task GuardarUsuarioAsync(object parameter)
+        {
+            // 1. Extraer la contraseña del control de forma segura
+            if (parameter is System.Windows.Controls.PasswordBox passwordBox)
+            {
+                string contrasenaClara = passwordBox.Password;
+
+                // Si es nuevo usuario y no hay contraseña, podrías validar aquí
+                if (IsNuevoUsuario && string.IsNullOrEmpty(contrasenaClara))
+                {
+                    _commonService.ShowError("La contraseña es obligatoria para nuevos usuarios.");
+                    return;
+                }
+
+                // Asignar la contraseña al DTO antes de enviar
+                UsuarioSeleccionado.Contrasena = contrasenaClara;
+            }
+
+            if (string.IsNullOrEmpty(UsuarioSeleccionado.UsuarioId)) return;
+
+            try
+            {
+                var request = new EdicionUsuarioRequest
+                {
+                    Usuario = UsuarioSeleccionado,
+                    RequestUserInfo = _commonService.GetRequestInfo()
+                };
+
+                
+                if (IsNuevoUsuario) _securityService.CrearUsuario(request);
+                else _securityService.EditarUsuario(request);
+            
+                _commonService.ShowSuccess("Operación exitosa");
+                IsNuevoUsuario = false;
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                _commonService.ShowError(ex.Message);
+            }
         }
     }
 }

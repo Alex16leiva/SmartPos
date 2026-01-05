@@ -5,7 +5,9 @@
              xmlns:views="clr-namespace:SmartPos.Views"
              xmlns:seguridad="clr-namespace:SmartPos.Views.Seguridad"
              xmlns:viewModels="clr-namespace:SmartPos.ViewModels"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException">
+             DispatcherUnhandledException="Application_DispatcherUnhandledException"
+             xmlns:converters="clr-namespace:SmartPos.Comunes.Converters"
+             >
    
     <Application.Resources>
         <ResourceDictionary>
@@ -14,12 +16,17 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:InverseBoolToVisConverter x:Key="InverseBoolToVisConverter"/>
+            <converters:NuevoEditarConverter x:Key="NuevoEditarConverter"/>
+
             <DataTemplate DataType="{x:Type viewModels:InventarioViewModel}">
                 <views:InventarioView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:SeguridadViewModel}">
                 <seguridad:SeguridadView  />
             </DataTemplate>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>
