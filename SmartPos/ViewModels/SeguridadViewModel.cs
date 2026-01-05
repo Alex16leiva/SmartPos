@@ -38,10 +38,12 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private string _textoBusqueda = string.Empty;
         private CancellationTokenSource _searchCts;
         [ObservableProperty] private int _paginaActual = 1;
+        [ObservableProperty] private int _totalPaginas = 0;
         [ObservableProperty] private int _registrosPorPagina = 10;
         [ObservableProperty] private UsuarioDTO _usuarioSeleccionado;
         [ObservableProperty] private bool _isNuevoUsuario;
         [ObservableProperty] private bool _isEditFlyoutUsuarioOpen;
+        public List<int> TamañosPagina { get; } = new() { 10, 20, 30, 50, 100 };
 
         async partial void OnTextoBusquedaChanged(string value)
         {
@@ -105,6 +107,7 @@ namespace SmartPos.ViewModels
                         };
                         var result = securityService.ObtenerUsuario(userRequest);
                         Usuarios = new ObservableCollection<UsuarioDTO>(result.Items);
+                        TotalPaginas = result.PageCount;
                     });
                 }
             }
@@ -225,18 +228,62 @@ namespace SmartPos.ViewModels
                         RequestUserInfo = _commonService.GetRequestInfo()
                     };
 
+                    UsuarioDTO response = null;
 
-                    if (IsNuevoUsuario) securityService.CrearUsuario(request);
-                    else securityService.EditarUsuario(request);
+                    if (IsNuevoUsuario)
+                    {
+                        response = securityService.CrearUsuario(request);
+                    }
+                    else
+                    {
+                        response = securityService.EditarUsuario(request);
+                    }
+
+                    if (response.HasValidationMessage())
+                    {
+                        _commonService.ShowWarning(response.Message);
+                        return;
+                    }
 
                     _commonService.ShowSuccess("Operación exitosa");
                     IsNuevoUsuario = false;
+                    IsEditFlyoutUsuarioOpen = false;
                 }
                 await LoadDataAsync();
             }
             catch (Exception ex)
             {
                 _commonService.ShowError(ex.Message);
+            }
+        }
+
+        partial void OnRegistrosPorPaginaChanged(int value)
+        {
+            // Reiniciamos a la página 1
+            PaginaActual = 1;
+
+            // Ejecutamos la carga de datos
+            // Usamos el método directamente ya que estamos en el mismo VM
+            _ = LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task SiguientePagina()
+        {
+            if (PaginaActual < TotalPaginas)
+            {
+                PaginaActual++;
+                await LoadDataAsync();
+            }
+        }
+
+        [RelayCommand]
+        private async Task AnteriorPagina()
+        {
+            if (PaginaActual > 1)
+            {
+                PaginaActual--;
+                await LoadDataAsync();
             }
         }
     }

@@ -123,7 +123,6 @@
             <mah:Flyout Header="GESTIÓN DE ARTÍCULO" 
             Position="Right" 
             Width="450" 
-            Theme="Adapt"
             IsOpen="{Binding IsEditFlyoutOpen}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="20">
