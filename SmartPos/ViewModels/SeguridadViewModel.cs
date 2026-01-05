@@ -4,6 +4,7 @@ using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Dominio.Core.Extensions;
 using SmartPos.Comunes.CommonServices;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -161,9 +162,18 @@ namespace SmartPos.ViewModels
                 UsuarioId = string.Empty,
                 Nombre = string.Empty,
                 RolId = string.Empty,
-                Contrasena = string.Empty
+                Contrasena = string.Empty,
+                EditarContrasena = true,
             };
             IsNuevoUsuario = true;
+            IsEditFlyoutUsuarioOpen = true;
+        }
+
+        [RelayCommand]
+        private void EditarUsuario(UsuarioDTO usuario)
+        {
+            UsuarioSeleccionado = usuario;
+            IsNuevoUsuario = false;
             IsEditFlyoutUsuarioOpen = true;
         }
 
@@ -190,6 +200,7 @@ namespace SmartPos.ViewModels
 
             try
             {
+                UsuarioSeleccionado.EditarContrasena = UsuarioSeleccionado.Contrasena.HasValue();
                 var request = new EdicionUsuarioRequest
                 {
                     Usuario = UsuarioSeleccionado,
