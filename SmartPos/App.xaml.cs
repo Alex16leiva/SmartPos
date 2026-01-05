@@ -51,8 +51,6 @@ namespace SmartPos
             services.AddDbContext<SmartPostDbContext>(options =>
             {
                 options.UseSqlServer(connectionString);
-                // Mantenemos el NoTracking por defecto para máxima limpieza
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }, ServiceLifetime.Scoped);
 
             // 3. Mapeo de Interfaz: Scoped
