@@ -56,6 +56,13 @@ namespace SmartPos.ViewModels
 
                 // Obtenemos la MainWindow desde nuestro contenedor de dependencias
                 var mainWindow = App.ServiceProvider.GetService<SmartPos.Views.MainWindow>();
+
+                // 3. ¡PASO CLAVE!: Obtener el ViewModel de la MainWindow y cargar menús
+                if (mainWindow.DataContext is MainViewModel mainVM)
+                {
+                    mainVM.CargarMenus();
+                }
+
                 mainWindow.Show();
 
                 var loginWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is SmartPos.Views.LoginView);

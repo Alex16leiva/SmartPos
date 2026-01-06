@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls;
+using SmartPos.Comunes.CommonServices;
 
 namespace SmartPos.ViewModels
 {
@@ -14,12 +15,20 @@ namespace SmartPos.ViewModels
         private HamburgerMenuItem _selectedMenuItem;
 
         private readonly IServiceProvider _serviceProvider;
-        public MainViewModel(IServiceProvider serviceProvider)
+        private readonly ICommonService _commonService;
+        public MainViewModel(IServiceProvider serviceProvider, ICommonService commonService)
         {
             _serviceProvider = serviceProvider;
+            _commonService = commonService;
 
-            // 1. Inicializar los items del menú
-            MenuItems = new HamburgerMenuItemCollection
+            MenuItems = new HamburgerMenuItemCollection();
+        }
+
+        public void CargarMenus()
+        {
+            
+            var accesos = _commonService.ObtenerPermisos();
+            var MenuItemsTemporal = new HamburgerMenuItemCollection
             {
                 new HamburgerMenuIconItem { Icon = "📦", Label = "Inventario", Tag = "Inventario" },
                 new HamburgerMenuIconItem { Icon = "🛒", Label = "Ventas", Tag = "Ventas" },
@@ -27,10 +36,19 @@ namespace SmartPos.ViewModels
 
             };
 
+            foreach (var acceso in accesos)
+            {
+                var nuevoMenu = MenuItemsTemporal
+                    .OfType<HamburgerMenuIconItem>()
+                    .FirstOrDefault(r => r.Label == acceso.PantallaId && acceso.Ver);
+
+                MenuItems.Add(nuevoMenu);
+            }
+
             // Por defecto, iniciamos en Inventario
-            // 2. Cargar vista por defecto
-            SelectedMenuItem = (HamburgerMenuItem)MenuItems.FirstOrDefault();
-            Navegar(SelectedMenuItem.Label);
+            // 1. Cargar vista por defecto
+            //SelectedMenuItem = (HamburgerMenuItem)MenuItems.FirstOrDefault();
+            //Navegar(SelectedMenuItem.Label);
         }
 
 

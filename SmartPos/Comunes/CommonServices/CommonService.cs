@@ -1,5 +1,6 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Seguridad;
+using Dominio.Context.Entidades.Seguridad;
 using Notifications.Wpf.Core;
 using SmartPos.Comunes.Notificaciones;
 using System.Windows.Controls.Primitives;
@@ -19,7 +20,7 @@ namespace SmartPos.Comunes.CommonServices
 
         public List<PermisosDTO> ObtenerPermisos()
         {
-            throw new NotImplementedException();
+            return Permisos;
         }
 
         public void SetearRequestInfo(UsuarioDTO usuarioDTO, int cajaId)
@@ -27,7 +28,10 @@ namespace SmartPos.Comunes.CommonServices
             RequestUserInfo = new RequestUserInfo
             {
                 UsuarioId = usuarioDTO.UsuarioId,
+                Caja = cajaId    
             };
+
+            Permisos = usuarioDTO.Permisos;
         }
 
         public void ShowWarning(string message)
