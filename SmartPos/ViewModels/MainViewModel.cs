@@ -6,13 +6,12 @@ namespace SmartPos.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private object _currentView;
-        [ObservableProperty]
-        private HamburgerMenuItemCollection _menuItems;
-
-        [ObservableProperty]
-        private HamburgerMenuItem _selectedMenuItem;
+        [ObservableProperty]private object _currentView;
+        [ObservableProperty]private HamburgerMenuItemCollection _menuItems;
+        [ObservableProperty]private HamburgerMenuItem _selectedMenuItem;
+        [ObservableProperty] private string _usuarioNombre;
+        [ObservableProperty] private int _cajaId;
+        [ObservableProperty]private bool _isBienvenidaVisible = true;
 
         private readonly IServiceProvider _serviceProvider;
         private readonly ICommonService _commonService;
@@ -49,6 +48,13 @@ namespace SmartPos.ViewModels
             // 1. Cargar vista por defecto
             //SelectedMenuItem = (HamburgerMenuItem)MenuItems.FirstOrDefault();
             //Navegar(SelectedMenuItem.Label);
+
+            var info = _commonService.GetRequestInfo();
+            if (info != null)
+            {
+                UsuarioNombre = info.UsuarioId; // O el nombre completo si lo tienes
+                CajaId = info.Caja;
+            }
         }
 
 
@@ -64,6 +70,7 @@ namespace SmartPos.ViewModels
 
         private void Navegar(string destino)
         {
+            IsBienvenidaVisible = false;
             switch (destino)
             {
                 case "Inventario":

@@ -3,20 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SmartPos"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:conv="clr-namespace:SmartPos.Comunes.Converters"
         mc:Ignorable="d"
         WindowState="Maximized"
         ResizeMode="NoResize"
         Title="SmartPost - Menú Principal" 
         Height="450" Width="800">
+
+    <mah:MetroWindow.Resources>
+        <conv:NullToVisibilityConverter x:Key="NullToVis" />
+    </mah:MetroWindow.Resources>
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
         <mah:HamburgerMenu x:Name="HamburgerMenuControl"
-                           DisplayMode="CompactInline"
-                           IsPaneOpen="False"
-                           ItemsSource="{Binding MenuItems}"
-                           SelectedItem="{Binding SelectedMenuItem}"
-                           Content="{Binding CurrentView}">
+                       Grid.Row="0"
+                       DisplayMode="CompactInline"
+                       IsPaneOpen="False"
+                       ItemsSource="{Binding MenuItems}"
+                       SelectedItem="{Binding SelectedMenuItem}"
+                       Content="{Binding CurrentView}">
+
+            <mah:HamburgerMenu.ContentTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <ContentControl Content="{Binding}" />
+
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" 
+                        Visibility="{Binding DataContext.CurrentView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NullToVis}}">
+
+                            <TextBlock Text="¡Hola! 👋" FontSize="40" FontWeight="Light" 
+                           HorizontalAlignment="Center" Foreground="#212529"/>
+
+                            <TextBlock Text="Bienvenido a SmartPos" FontSize="22" 
+                           HorizontalAlignment="Center" Margin="0,10" Foreground="#495057"/>
+
+                            <TextBlock Text="Seleccione una opción del menú para comenzar." 
+                           FontSize="14" HorizontalAlignment="Center" Foreground="#6C757D" 
+                           FontStyle="Italic"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </mah:HamburgerMenu.ContentTemplate>
 
             <mah:HamburgerMenu.ItemTemplate>
                 <DataTemplate DataType="{x:Type mah:HamburgerMenuIconItem}">
@@ -25,15 +58,36 @@
                             <ColumnDefinition Width="48" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Icon}" 
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Label}" 
-                                   VerticalAlignment="Center" FontSize="16" Margin="10,0,0,0"/>
+                        <TextBlock Grid.Column="0" Text="{Binding Icon}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center" FontSize="16" Margin="10,0,0,0"/>
                     </Grid>
                 </DataTemplate>
             </mah:HamburgerMenu.ItemTemplate>
-
         </mah:HamburgerMenu>
+
+        <StatusBar Grid.Row="1" Background="#E9ECEF" BorderBrush="#ADB5BD" BorderThickness="0,1,0,0" Padding="8,4">
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="👤 USUARIO: " FontWeight="Bold" Foreground="#212529" FontSize="12"/>
+                    <TextBlock Text="{Binding UsuarioNombre}" Margin="5,0,20,0" Foreground="#212529" FontSize="12"/>
+                </StackPanel>
+            </StatusBarItem>
+
+            <Separator Background="#ADB5BD"/>
+
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🖥️ CAJA: " FontWeight="Bold" Foreground="#212529" FontSize="12"/>
+                    <TextBlock Text="{Binding CajaId}" Margin="5,0,20,0" Foreground="#212529" FontSize="12"/>
+                </StackPanel>
+            </StatusBarItem>
+
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="📅 " FontSize="12"/>
+                    <TextBlock Text="{Binding FechaActual, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Foreground="#212529" FontWeight="Medium" FontSize="12"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </mah:MetroWindow>
-

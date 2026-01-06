@@ -19,7 +19,7 @@
 
             <converters:InverseBoolToVisConverter x:Key="InverseBoolToVisConverter"/>
             <converters:NuevoEditarConverter x:Key="NuevoEditarConverter"/>
-
+            
             <DataTemplate DataType="{x:Type viewModels:InventarioViewModel}">
                 <views:InventarioView />
             </DataTemplate>
