@@ -7,6 +7,7 @@
              xmlns:viewModels="clr-namespace:SmartPos.ViewModels"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              xmlns:converters="clr-namespace:SmartPos.Comunes.Converters"
+             ShutdownMode="OnLastWindowClose"
              >
    
     <Application.Resources>

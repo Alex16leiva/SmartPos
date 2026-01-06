@@ -18,5 +18,6 @@ namespace SmartPos.Comunes.CommonServices
         void ShowSuccess(string message);
 
         void ShowInfo(string message);
+        void LimpiarSesion();
     }
 }

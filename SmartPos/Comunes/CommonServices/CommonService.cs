@@ -103,5 +103,11 @@ namespace SmartPos.Comunes.CommonServices
                 timer.Start();
             });
         }
+
+        public void LimpiarSesion()
+        {
+            RequestUserInfo = null;
+            Permisos = null;
+        }
     }
 }

@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:conv="clr-namespace:SmartPos.Comunes.Converters"
+        xmlns:conv="clr-namespace:SmartPos.Comunes.Converters"         
         mc:Ignorable="d"
         WindowState="Maximized"
         ResizeMode="NoResize"
         Title="SmartPost - Menú Principal" 
-        Height="450" Width="800">
+        Height="450" Width="800"
+        >
 
     <mah:MetroWindow.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVis" />
@@ -27,7 +28,23 @@
                        IsPaneOpen="False"
                        ItemsSource="{Binding MenuItems}"
                        SelectedItem="{Binding SelectedMenuItem}"
+                           OptionsItemsSource="{Binding OptionMenuItems}"
+                   
+                   SelectedOptionsItem="{Binding SelectedOptionItem}"
                        Content="{Binding CurrentView}">
+
+            <mah:HamburgerMenu.OptionsItemTemplate>
+                <DataTemplate DataType="{x:Type mah:HamburgerMenuIconItem}">
+                    <Grid Height="48">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Icon}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center" FontSize="16" Margin="10,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </mah:HamburgerMenu.OptionsItemTemplate>
 
             <mah:HamburgerMenu.ContentTemplate>
                 <DataTemplate>
@@ -84,10 +101,17 @@
 
             <StatusBarItem HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="📅 " FontSize="12"/>
-                    <TextBlock Text="{Binding FechaActual, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Foreground="#212529" FontWeight="Medium" FontSize="12"/>
+                    <TextBlock Text="⏰" Foreground="#212529" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding FechaActual, StringFormat='{}{0:dd/MM/yyyy  hh:mm:ss tt}'}" 
+                   Foreground="#005A9E" 
+                   FontWeight="Bold" 
+                   FontSize="12" 
+                   FontFamily="Consolas"
+                   VerticalAlignment="Center"/>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
+        
+        
     </Grid>
 </mah:MetroWindow>
