@@ -42,7 +42,9 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private int _registrosPorPagina = 10;
         [ObservableProperty] private UsuarioDTO _usuarioSeleccionado;
         [ObservableProperty] private bool _isNuevoUsuario;
+        [ObservableProperty] private bool _isNuevoRol;
         [ObservableProperty] private bool _isEditFlyoutUsuarioOpen;
+        [ObservableProperty] private bool _isEditFlyoutRolOpen;
         public List<int> TamañosPagina { get; } = new() { 10, 20, 30, 50, 100 };
 
         async partial void OnTextoBusquedaChanged(string value)
@@ -133,6 +135,7 @@ namespace SmartPos.ViewModels
                 {
                     PantallaId = s.PantallaId,
                     RolId = value.RolId,
+                    
                     // Buscamos si el rol ya tiene este permiso
                     Ver = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Ver ?? false,
                     Editar = value.Permisos?.FirstOrDefault(p => p.PantallaId == s.PantallaId)?.Editar ?? false,
@@ -188,11 +191,83 @@ namespace SmartPos.ViewModels
         }
 
         [RelayCommand]
+        private void NuevoRol()
+        {
+            RolSeleccionado = new RolDTO
+            {
+                Descripcion = string.Empty,
+                RolId = string.Empty
+            };
+            IsNuevoRol = true;
+            IsEditFlyoutRolOpen = true;
+        }
+
+        [RelayCommand]
+        private void EditarRol(RolDTO rol)
+        {
+            RolSeleccionado = new RolDTO
+            {
+                RolId = rol.RolId,
+                Descripcion = rol.Descripcion,
+            };
+            IsEditFlyoutRolOpen = true;
+            IsNuevoRol = false;
+        }
+        
+        [RelayCommand]
         private void EditarUsuario(UsuarioDTO usuario)
         {
             UsuarioSeleccionado = usuario;
             IsNuevoUsuario = false;
             IsEditFlyoutUsuarioOpen = true;
+        }
+
+        [RelayCommand]
+        public async Task GuardarRol()
+        {
+            try
+            {
+                if (RolSeleccionado == null) return;
+                // Creamos un Scope único para esta transacción
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var securityService = scope.ServiceProvider.GetRequiredService<ISecurityApplicationService>();
+
+                    var request = new EdicionRolRequest
+                    {
+                        Rol = RolSeleccionado,
+                        RequestUserInfo = _commonService.GetRequestInfo()
+                    };
+
+                    RolDTO resultado;
+                    // Lógica para decidir si es creación o edición
+                    if (IsNuevoRol)
+                    {
+                        resultado = await Task.Run(() => securityService.CrearRol(request));
+                    }
+                    else
+                    {
+                        // Asumiendo que existe este método en tu servicio
+                        resultado = await Task.Run(() => securityService.EditarRol(request));
+                    }
+
+                    if (resultado.Message.IsMissingValue())
+                    {
+                        // Notificar éxito (puedes usar tu CommonService)
+                        _commonService.ShowSuccess("Rol guardado correctamente");
+                        IsEditFlyoutRolOpen = false; // Cerrar el panel
+                        await LoadDataAsync(); // Recargar la lista
+                    }
+                    else
+                    {
+                        _commonService.ShowError(resultado.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _commonService.ShowError("Error al procesar el rol: " + ex.Message);
+            }
         }
 
         [RelayCommand]

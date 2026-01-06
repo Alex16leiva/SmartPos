@@ -238,7 +238,9 @@ namespace Aplicacion.Services
             new RolDTO
             {
                 Descripcion = qry.Descripcion,
-                RolId = qry.RolId,
+                RolId = qry.RolId, 
+                FechaTransaccion = qry.FechaTransaccion,
+                ModificadoPor = qry.ModificadoPor,
                 Permisos = MapPermisosDto(qry?.Permisos?.ToList()),
             }).ToList();
         }
