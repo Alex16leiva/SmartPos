@@ -58,14 +58,28 @@ namespace SmartPos.ViewModels
 
         private void CerrarSesion()
         {
-            _timer?.Stop(); // Detener el reloj antes de salir
+            // 1. Detenemos el reloj para liberar recursos
+            _timer?.Stop();
+
+            // 2. Limpiamos la sesión en el Singleton
             _commonService.LimpiarSesion();
 
+            // 3. Obtenemos el Login desde el contenedor de dependencias
             var loginView = _serviceProvider.GetRequiredService<SmartPos.Views.LoginView>();
+
+            // 4. Mostramos el Login PRIMERO
             loginView.Show();
 
-            // Cerramos explícitamente la ventana que contiene este ViewModel
-            Application.Current.Windows.OfType<SmartPos.Views.MainWindow>().FirstOrDefault()?.Close();
+            // 5. Buscamos todas las instancias de MainWindow y las cerramos
+            // Hacemos un .ToList() para evitar errores de "colección modificada"
+            var ventanasACerrar = Application.Current.Windows
+                .OfType<SmartPos.Views.MainWindow>()
+                .ToList();
+
+            foreach (var window in ventanasACerrar)
+            {
+                window.Close();
+            }
         }
 
         private void ConfigurarOpcionesSistema()

@@ -33,6 +33,8 @@
                    SelectedOptionsItem="{Binding SelectedOptionItem}"
                        Content="{Binding CurrentView}">
 
+            
+            
             <mah:HamburgerMenu.OptionsItemTemplate>
                 <DataTemplate DataType="{x:Type mah:HamburgerMenuIconItem}">
                     <Grid Height="48">
