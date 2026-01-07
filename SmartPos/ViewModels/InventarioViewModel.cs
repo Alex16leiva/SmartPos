@@ -183,10 +183,9 @@ namespace SmartPos.ViewModels
                 }
             }
 
-                // 3. Cerramos el panel lateral
-                IsEditFlyoutOpen = false;
+            // 3. Cerramos el panel lateral
+            IsEditFlyoutOpen = false;
 
-            
             IsBusy = false;
             await LoadDataAsync();
         }
@@ -225,12 +224,11 @@ namespace SmartPos.ViewModels
         public async Task LoadDataAsync()
         {
             IsBusy = true; // Para mostrar el ProgressRing de MahApps
+            var request = new ArticuloRequest
+            {
+                QueryInfo = ObtenerQueryInfoArticulo()
+            };
 
-            
-                var request = new ArticuloRequest
-                {
-                    QueryInfo = ObtenerQueryInfoArticulo()
-                };
             using (var scope = _scopeFactory.CreateScope())
             {
                 var _articuloApplicationService = scope.ServiceProvider.GetRequiredService<IArticuloApplicationService>();

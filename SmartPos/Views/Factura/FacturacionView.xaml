@@ -23,14 +23,33 @@
 
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="CÓDIGO DE ARTÍCULO / ESCÁNER" FontWeight="Bold" FontSize="11" Foreground="#495057" Margin="2,0,0,5"/>
-                    <TextBox Text="{Binding BusquedaArticulo, UpdateSourceTrigger=PropertyChanged}"
-                             mah:TextBoxHelper.Watermark="Escanee o escriba el código..."
-                             mah:TextBoxHelper.ClearTextButton="True"
-                             FontSize="20" FontWeight="SemiBold"
-                             mah:TextBoxHelper.SelectAllOnFocus="True">
+
+
+                    <TextBox x:Name="TxtBusqueda" 
+         Text="{Binding BusquedaArticulo, UpdateSourceTrigger=PropertyChanged}"
+         mah:TextBoxHelper.Watermark="Escanee o escriba el código..."
+         FontSize="20" 
+         FontWeight="SemiBold"
+         mah:TextBoxHelper.SelectAllOnFocus="True"
+         
+         Style="{StaticResource MahApps.Styles.TextBox.Button}"
+         >
+
+                        <mah:TextBoxHelper.ButtonContent>
+                            <Button Command="{Binding AbrirBuscadorArticulosCommand}"
+                            Width="40"
+                            VerticalAlignment="Stretch" 
+                            HorizontalAlignment="Center"
+                            Cursor="Hand">
+                                <Viewbox Width="20" Height="20">
+                                    <TextBlock Text="🔍" Foreground="#005A9E"/>
+                                </Viewbox>
+                            </Button>
+                        </mah:TextBoxHelper.ButtonContent>
+
                         <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding AgregarArticuloCommand}" 
-                                        CommandParameter="{Binding BusquedaArticulo}"/>
+                            <KeyBinding Key="Enter" Command="{Binding AgregarArticuloCommand}"/>
+                            <KeyBinding Key="F2" Command="{Binding AbrirBuscadorArticulosCommand}"/>
                         </TextBox.InputBindings>
                     </TextBox>
                 </StackPanel>
@@ -56,7 +75,7 @@
                   BorderBrush="#DEE2E6">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="CÓDIGO" Binding="{Binding ArticuloId}" Width="150" IsReadOnly="True"/>
-                <DataGridTextColumn Header="DESCRIPCIÓN" Binding="{Binding DescripcionTransaccion}" Width="*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="DESCRIPCIÓN" Binding="{Binding DescripcionExtendida}" Width="*" IsReadOnly="True"/>
                 <DataGridTextColumn Header="CANT" Binding="{Binding Cantidad}" Width="80">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
