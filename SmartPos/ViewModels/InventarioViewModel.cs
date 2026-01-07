@@ -1,9 +1,11 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
+using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Core.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using System.Collections.ObjectModel;
@@ -12,11 +14,11 @@ namespace SmartPos.ViewModels
 {
     public partial class InventarioViewModel : ObservableObject
     {
-        private readonly IArticuloApplicationService _articuloApplicationService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommonService _commonService;
-        public InventarioViewModel(IArticuloApplicationService articuloApplicationService, ICommonService commonService)
+        public InventarioViewModel(IServiceScopeFactory scopeFactory, ICommonService commonService)
         {
-            _articuloApplicationService = articuloApplicationService;
+            _scopeFactory = scopeFactory;
             _commonService = commonService;
             _articulos = new ObservableCollection<ArticulosDTO>();
             LoadDataAsync();
@@ -112,25 +114,25 @@ namespace SmartPos.ViewModels
                 }
             };
 
-            // 2. Ajustar signo según el tipo seleccionado
-            decimal cantidadFinal = TipoMovimientoSeleccionado == "SALIDA" ? -CantidadAjuste : CantidadAjuste;
-
-            // 3. Llamar al AppService con toda la data de la pantalla
-            var res = await _articuloApplicationService.RegistrarMovimientoAsync(request);
-
-            if (res.Message.IsMissingValue())
+            using (var scope = _scopeFactory.CreateScope())
             {
-                _commonService.ShowSuccess("Movimiento de stock registrado.");
+                var _articuloApplicationService = scope.ServiceProvider.GetRequiredService<IArticuloApplicationService>();
+                var response = await _articuloApplicationService.RegistrarMovimientoAsync(request);
 
-                // Limpiar campos después de aplicar
-                CantidadAjuste = 0;
-                NotasAjuste = string.Empty;
+                if (response.Message.IsMissingValue())
+                {
+                    _commonService.ShowSuccess("Movimiento de stock registrado.");
 
-                await LoadDataAsync(); // Refrescar stock en pantalla
-            }
-            else
-            {
-                _commonService.ShowError(res.Message);
+                    // Limpiar campos después de aplicar
+                    CantidadAjuste = 0;
+                    NotasAjuste = string.Empty;
+
+                    await LoadDataAsync(); // Refrescar stock en pantalla
+                }
+                else
+                {
+                    _commonService.ShowError(response.Message);
+                }
             }
             IsEditFlyoutOpen = false;
             IsBusy = false;
@@ -150,27 +152,35 @@ namespace SmartPos.ViewModels
             };
             if (IsNuevoArticulo)
             {
-                var resultado = await _articuloApplicationService.CrearArticuloAsync(request);
-
-                // 3. Validar si el servicio retornó un mensaje de error
-                if (resultado.Message.HasValue())
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    _commonService.ShowError(resultado.Message);
-                    return;
+                    var _articuloApplicationService = scope.ServiceProvider.GetRequiredService<IArticuloApplicationService>();
+                    var resultado = await _articuloApplicationService.CrearArticuloAsync(request);
+
+                    // 3. Validar si el servicio retornó un mensaje de error
+                    if (resultado.Message.HasValue())
+                    {
+                        _commonService.ShowError(resultado.Message);
+                        return;
+                    }
+                    _commonService.ShowSuccess("Artículo creado correctamente");
                 }
-                _commonService.ShowSuccess("Artículo creado correctamente");
             }
             else
             {
-                var resultado = await _articuloApplicationService.ActualizarArticuloAsync(request);
-
-                // 3. Validar si el servicio retornó un mensaje de error
-                if (resultado.Message.HasValue())
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    _commonService.ShowError(resultado.Message);
-                    return;
+                    var _articuloApplicationService = scope.ServiceProvider.GetRequiredService<IArticuloApplicationService>();
+                    var resultado = await _articuloApplicationService.ActualizarArticuloAsync(request);
+
+                    // 3. Validar si el servicio retornó un mensaje de error
+                    if (resultado.Message.HasValue())
+                    {
+                        _commonService.ShowError(resultado.Message);
+                        return;
+                    }
+                    _commonService.ShowSuccess("Cambios guardados");
                 }
-                _commonService.ShowSuccess("Cambios guardados");
             }
 
                 // 3. Cerramos el panel lateral
@@ -221,16 +231,19 @@ namespace SmartPos.ViewModels
                 {
                     QueryInfo = ObtenerQueryInfoArticulo()
                 };
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var _articuloApplicationService = scope.ServiceProvider.GetRequiredService<IArticuloApplicationService>();
 
-            var result = _articuloApplicationService.ObtenerArticulos(request);
+                var result = _articuloApplicationService.ObtenerArticulos(request);
                 // Actualizamos la UI en el hilo principal
 
-                    Articulos = new ObservableCollection<ArticulosDTO>(result.Items);
+                Articulos = new ObservableCollection<ArticulosDTO>(result.Items);
 
-                    // Actualizamos el total de páginas basándonos en la respuesta del backend
-                    // Si PagedCollection tiene TotalCount, úsalo aquí:
-                    TotalPaginas = result.PageCount;
-            
+                // Actualizamos el total de páginas basándonos en la respuesta del backend
+                // Si PagedCollection tiene TotalCount, úsalo aquí:
+                TotalPaginas = result.PageCount;
+            }
             IsBusy = false; // Ocultar el ProgressRing
         }
 

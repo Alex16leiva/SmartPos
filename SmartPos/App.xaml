@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:SmartPos"
              xmlns:views="clr-namespace:SmartPos.Views"
              xmlns:seguridad="clr-namespace:SmartPos.Views.Seguridad"
+             xmlns:factura="clr-namespace:SmartPos.Views.Factura"
              xmlns:viewModels="clr-namespace:SmartPos.ViewModels"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              xmlns:converters="clr-namespace:SmartPos.Comunes.Converters"
@@ -27,7 +28,10 @@
             <DataTemplate DataType="{x:Type viewModels:SeguridadViewModel}">
                 <seguridad:SeguridadView  />
             </DataTemplate>
-            
+            <DataTemplate DataType="{x:Type viewModels:FacturacionViewModel}">
+                <factura:FacturacionView />
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

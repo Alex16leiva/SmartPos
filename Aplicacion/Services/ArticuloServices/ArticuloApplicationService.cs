@@ -139,35 +139,30 @@ namespace Aplicacion.Services.ArticuloServices
 
             // 1. Guardamos estado anterior para el histórico
             decimal cantidadAnterior = articulo.Cantidad;
-            decimal cantidadReal = request.InventarioMovimiento.CantidadMovimiento;
-            if (request.InventarioMovimiento.TipoMovimiento == "SALIDA" && request.InventarioMovimiento.CantidadMovimiento > 0)
+            decimal cantidadMovimiento = Math.Abs(request.InventarioMovimiento.CantidadMovimiento);
+            if (request.InventarioMovimiento.TipoMovimiento == "SALIDA")
             {
-                if (articulo.Cantidad < request.InventarioMovimiento.CantidadMovimiento)
+                if (articulo.RebajarCantidad(cantidadMovimiento))
                 {
                     return new ArticulosDTO 
                     {
-                        Message = $"Error: No hay suficiente stock. Disponible: {articulo.Cantidad}, Intento: {Math.Abs(request.InventarioMovimiento.CantidadMovimiento)}"
+                        Message = $"Error: No hay suficiente stock. Disponible: {articulo.Cantidad}, Intento: {cantidadMovimiento}"
                     };
                 }
-                cantidadReal = request.InventarioMovimiento.CantidadMovimiento * -1;
             }
-            else if (request.InventarioMovimiento.TipoMovimiento == "ENTRADA" && request.InventarioMovimiento.CantidadMovimiento < 0)
+
+            if (request.InventarioMovimiento.TipoMovimiento == "ENTRADA")
             {
-                cantidadReal = Math.Abs(request.InventarioMovimiento.CantidadMovimiento); // Aseguramos que entrada sea positiva
-                articulo.UltimoRecibo = DateTime.Now;
+                articulo.AjusteDeAumento(cantidadMovimiento);
                 articulo.ActualizarCosto(request.InventarioMovimiento.CostoUnitario);
             }
-
-
-            // 2. Actualizamos la entidad principal
-            articulo.Cantidad += cantidadReal;
 
             // 3. Creamos el registro del movimiento
             var movimiento = new InventarioMovimiento
             {
                 ArticuloId = articulo.ArticuloId,
                 CantidadAnterior = cantidadAnterior,
-                CantidadMovimiento = cantidadReal,
+                CantidadMovimiento = cantidadMovimiento,
                 CantidadNueva = articulo.Cantidad,
                 TipoMovimiento = request.InventarioMovimiento.TipoMovimiento,
                 Referencia = request.InventarioMovimiento.Referencia,

@@ -1,4 +1,5 @@
-﻿using Dominio.Core;
+﻿using Dominio.Context.Entidades.FacturaAgg;
+using Dominio.Core;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -61,6 +62,8 @@ namespace Dominio.Context.Entidades.Articulos
         public string? ImagenRuta { get; set; }
         public string? Notas { get; set; }
         public bool Inactivo { get; set; }
+        public virtual Impuesto Impuesto { get; set; }
+        public virtual ICollection<FacturaDetalle> FacturaDetalle { get; set; }
         [ForeignKey("ArticuloId")]
         public virtual ICollection<InventarioMovimiento> InventarioMovimiento { get; set; }
 
@@ -73,5 +76,55 @@ namespace Dominio.Context.Entidades.Articulos
             UltimoCosto = Costo;
             Costo = costo;
         }
+
+        public decimal ObtenerPorcentajeImpuesto()
+        {
+            return TieneImpuesto() ? Convert.ToDecimal(Impuesto.Porcentaje / 100) : 0;
+        }
+
+        internal bool TienePromocion()
+        {
+            DateTime fechaActual = DateTime.Now;
+
+            return OfertaActiva && (FechaInicioOferta <= fechaActual && FechaFinalOferta >= fechaActual);
+        }
+
+        internal decimal ObtenerPrecioSinImpuesto(decimal precio)
+        {
+            decimal porcentajeImpuesto = 0;
+            if (TieneImpuesto())
+            {
+                porcentajeImpuesto = ObtenerPorcentajeImpuesto();
+            }
+            return (precio / (porcentajeImpuesto + 1));
+        }
+
+        public bool HayCantidadSuficiente(decimal cantidadRequerida)
+        {
+            return cantidadRequerida <= Cantidad;
+        }
+
+        public bool TieneImpuesto()
+        {
+            return Impuesto != null;
+        }
+
+        public void AjusteDeAumento(decimal cantida)
+        {
+            Cantidad += cantida;
+            UltimoRecibo = DateTime.Now;
+        }
+
+        public bool RebajarCantidad(decimal cantidadMovimiento)
+        {
+            if (HayCantidadSuficiente(cantidadMovimiento))
+            {
+                Cantidad -= cantidadMovimiento; 
+                return true; 
+            }
+            return false; 
+        }
+
+       
     }
 }

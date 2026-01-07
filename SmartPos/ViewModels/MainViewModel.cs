@@ -163,7 +163,8 @@ namespace SmartPos.ViewModels
                     CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<SeguridadViewModel>(_serviceProvider);
                     break;
                 case "Ventas":
-                    // CurrentView = _serviceProvider.GetRequiredService<VentasViewModel>();
+                     CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<FacturacionViewModel>(_serviceProvider);
+
                     break;
             }
         }

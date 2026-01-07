@@ -1,5 +1,7 @@
 ﻿using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
+using Aplicacion.Services.Factura;
+using Dominio.Context.Services;
 using Infraestructura.Context;
 using Infraestructura.Core.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using SmartPos.Comunes.CommonServices;
 using SmartPos.Comunes.Extensions;
 using SmartPos.ViewModels;
 using SmartPos.Views;
+using SmartPos.Views.Factura;
 using System.IO;
 using System.Windows;
 
@@ -64,10 +67,12 @@ namespace SmartPos
             services.AddTransient<InventarioViewModel>();
             services.AddTransient<LoginViewModel>();
             services.AddTransient<SeguridadViewModel>();
+            services.AddTransient<FacturacionViewModel>();
 
             // 6. Vistas
             services.AddTransient<Views.MainWindow>();
             services.AddTransient<LoginView>();
+            services.AddTransient<FacturacionView>();
 
 
             // 7. ApplicationServices
@@ -75,6 +80,8 @@ namespace SmartPos
             services.AddScoped<ISecurityApplicationService, SecurityApplicationService>();
             services.AddScoped<IArticuloApplicationService, ArticuloApplicationService>();
             services.AddScoped<ILogService, LogService>();
+            services.AddScoped<IFacturaApplicationService, FacturaApplicationService>();
+            services.AddScoped<IFacturaServicioDominio, FacturaServicioDominio>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
             services.AddApplicationServicesWithInterceptors();
