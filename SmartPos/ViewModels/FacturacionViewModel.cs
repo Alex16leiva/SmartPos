@@ -107,6 +107,22 @@ namespace SmartPos.ViewModels
         }
 
         [RelayCommand]
+        private void EliminarArticulo(FacturaDetalleDTO detalle)
+        {
+            if (detalle == null) return;
+
+            // 1. Remover de la colección observable
+            FacturaDetalle.Remove(detalle);
+
+            // 2. Recalcular totales (Importante para que la factura se actualice)
+            ActualizarTotales();
+
+            // 3. Devolver el foco al cuadro de búsqueda para seguir vendiendo
+            // Esto lo manejamos usualmente con un mensaje o propiedad si es necesario,
+            // pero al estar en el mismo VM, la UI se actualiza sola.
+        }
+
+        [RelayCommand]
         public async Task LoadDataBusquedaAsync()
         {
             IsBusy = true;

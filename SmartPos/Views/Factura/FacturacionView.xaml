@@ -76,6 +76,22 @@
                   BorderThickness="1"
                   BorderBrush="#DEE2E6">
             <DataGrid.Columns>
+                
+                    <DataGridTemplateColumn Width="28">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.EliminarArticuloCommand, 
+                                     RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource MahApps.Styles.Button.Chromeless}"
+                            Foreground="Red"
+                            ToolTip="Eliminar artículo">
+                                    <TextBlock Text="❌" FontSize="16"/>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Header="CÓDIGO" Binding="{Binding ArticuloId}" Width="150" IsReadOnly="True"/>
                 <DataGridTextColumn Header="DESCRIPCIÓN" Binding="{Binding DescripcionExtendida}" Width="*" IsReadOnly="True"/>
                 <DataGridTextColumn Header="CANT" Binding="{Binding Cantidad}" Width="80">
