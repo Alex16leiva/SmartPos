@@ -1,4 +1,4 @@
-﻿using Aplicacion.DTOs.Comunes;
+﻿using Aplicacion.DTOs.Vendedores;
 
 namespace Aplicacion.DTOs.Factura
 {

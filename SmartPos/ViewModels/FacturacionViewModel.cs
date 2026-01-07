@@ -1,11 +1,13 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
-using Aplicacion.DTOs.Comunes;
 using Aplicacion.DTOs.Factura;
+using Aplicacion.DTOs.Vendedores;
 using Aplicacion.Services.ArticuloServices;
 using Aplicacion.Services.Factura;
+using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.FacturaAgg;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,13 +22,16 @@ namespace SmartPos.ViewModels
     {
         [ObservableProperty] private ObservableCollection<FacturaDetalleDTO> _facturaDetalle = new();
         [ObservableProperty] private FacturaEncabezadoDTO _encabezado = new();
-        [ObservableProperty] private VendedorDTO _vendedorSeleccionado = new();
         [ObservableProperty] private string _busquedaArticulo = string.Empty;
 
         [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
         [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado;
         [ObservableProperty] private string _textoBusquedaModal = string.Empty;
         [ObservableProperty] private bool _isBusy;
+
+        [ObservableProperty] private ObservableCollection<VendedorDTO> _vendedores = new();
+        [ObservableProperty] private VendedorDTO _vendedorSeleccionado = new();
+        
 
         // Propiedades de Paginación
         [ObservableProperty] private int _paginaActual = 1;
@@ -40,8 +45,41 @@ namespace SmartPos.ViewModels
         {
             _commonService = commonService;
             _scopeFactory = scopeFactory;
+
+            CargarVendedoresAsync();
         }
 
+        public void CargarVendedoresAsync()
+        {
+            try
+            {
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var vendedorService = scope.ServiceProvider.GetRequiredService<IVendedorApplicationService>();
+
+                    // Reutilizamos tu lógica de QueryInfo si el servicio es paginado, 
+                    // o un método simple de "ObtenerTodos"
+                    var request = new ObtenerVendedor
+                    {
+                        QueryInfo = new QueryInfo { PageSize = 100, Ascending = true, SortFields = new() { "Nombre" } }
+                    };
+
+                    var result = vendedorService.ObtenerVendedores(request);
+
+                    if (result.HasItems())
+                    {
+                        Vendedores = new ObservableCollection<VendedorDTO>(result);
+
+                        // Opcional: Seleccionar el primer vendedor por defecto
+                        VendedorSeleccionado = Vendedores.FirstOrDefault();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _commonService.ShowError($"Error al cargar vendedores: {ex.Message}");
+            }
+        }
 
         [RelayCommand]
         private void AgregarArticulo(string codigo)

@@ -1,6 +1,7 @@
 ﻿using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
 using Aplicacion.Services.Factura;
+using Aplicacion.Services.VendedorSevices;
 using Dominio.Context.Services;
 using Infraestructura.Context;
 using Infraestructura.Core.Logging;
@@ -82,6 +83,7 @@ namespace SmartPos
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IFacturaApplicationService, FacturaApplicationService>();
             services.AddScoped<IFacturaServicioDominio, FacturaServicioDominio>();
+            services.AddScoped<IVendedorApplicationService, VendedorApplicationService>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
             services.AddApplicationServicesWithInterceptors();
