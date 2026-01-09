@@ -84,9 +84,43 @@ namespace Dominio.Context.Services
             return facturasDetalle;
         }
 
-        public List<FacturaDetalle> CalcularFacturasDetalle(List<FacturaDetalle> facturasDetallEntidad, IEnumerable<Articulo> articulosEntidad, IEnumerable<Vendedor> vendedoresEntidad)
+        public List<FacturaDetalle> CalcularFacturasDetalle(List<FacturaDetalle> facturasDetalleEntidad, 
+            IEnumerable<Articulo> articulosEntidad, IEnumerable<Vendedor> vendedoresEntidad)
         {
-            throw new NotImplementedException();
+            List<FacturaDetalle> facturasDetalle = new List<FacturaDetalle>();
+            foreach (var item in facturasDetalleEntidad)
+            {
+                Articulo articulo = articulosEntidad.FirstOrDefault(r => r.ArticuloId == item.ArticuloId);
+                Vendedor vendedor = vendedoresEntidad.FirstOrDefault(r => r.VendedorId == item.VendedorId);
+                decimal cantidadArticulos = facturasDetalle.Where(r => r.ArticuloId == item.ArticuloId).Sum(r => r.Cantidad);
+                cantidadArticulos += item.Cantidad;
+                if (!articulo.HayCantidadSuficiente(cantidadArticulos))
+                {
+                    item.Cantidad = item.CantidadOriginal;
+                    if (!articulo.HayCantidadSuficiente(item.Cantidad))
+                    {
+                        continue;
+                    }
+                }
+
+                if (vendedor == null)
+                {
+                    item.VendedorId = 0;
+                    item.NombreVendedor = string.Empty;
+                }
+                else
+                {
+                    item.VendedorId = vendedor.VendedorId;
+                    item.NombreVendedor = vendedor.Nombre;
+                }
+                item.Articulo = articulo;
+
+                facturasDetalle.Add(item);
+            }
+
+            CalcularTotales(facturasDetalle);
+
+            return facturasDetalle;
         }
     }
 }

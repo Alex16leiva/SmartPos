@@ -86,14 +86,14 @@ namespace SmartPos.ViewModels
         {
             using (var scope = _scopeFactory.CreateScope())
             {
-                var articuloAppService = scope.ServiceProvider.GetRequiredService<IFacturaApplicationService>();
-                AgregarArticuloRequest request = new AgregarArticuloRequest
+                var facturaAppService = scope.ServiceProvider.GetRequiredService<IFacturaApplicationService>();
+                FacturaRequest request = new FacturaRequest
                 {
                     ArticuloId = BusquedaArticulo.Trim(),
-                    Vendedor = VendedorSeleccionado,
+                    Vendedor = VendedorSeleccionado ?? new VendedorDTO(),
                     FacturasDetalle = FacturaDetalle.ToList()
                 };
-                var response = articuloAppService.AgregarArticuloAFactura(request);
+                var response = facturaAppService.AgregarArticuloAFactura(request);
 
                 if (response.Message.HasValue())
                 {
@@ -114,12 +114,32 @@ namespace SmartPos.ViewModels
             // 1. Remover de la colección observable
             FacturaDetalle.Remove(detalle);
 
-            // 2. Recalcular totales (Importante para que la factura se actualice)
-            ActualizarTotales();
+            CalcularFacturaDetalle();
 
-            // 3. Devolver el foco al cuadro de búsqueda para seguir vendiendo
-            // Esto lo manejamos usualmente con un mensaje o propiedad si es necesario,
-            // pero al estar en el mismo VM, la UI se actualiza sola.
+            ActualizarTotales();
+        }
+
+        public void ActualizacionDeDataGrid()
+        {
+            CalcularFacturaDetalle();
+
+            ActualizarTotales();
+        }
+
+        private void CalcularFacturaDetalle()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var facturaAppService = scope.ServiceProvider.GetRequiredService<IFacturaApplicationService>();
+                FacturaRequest request = new FacturaRequest
+                {
+                    FacturasDetalle = FacturaDetalle.ToList()
+                };
+
+                var response = facturaAppService.CalcularFacturaDetalle(request);
+                FacturaDetalle = new ObservableCollection<FacturaDetalleDTO>(response.FacturaDetalle);
+            }
+
         }
 
         [RelayCommand]
@@ -191,10 +211,32 @@ namespace SmartPos.ViewModels
             }
         }
 
-        private void ActualizarTotales()
+        [RelayCommand]
+        private void LimpiarPantalla()
         {
+            // 1. Vaciar la colección de detalles
+            FacturaDetalle.Clear();
+
+            // 2. Reiniciar el encabezado (esto limpia Subtotal, Impuesto y Total)
+            Encabezado = new FacturaEncabezadoDTO();
+
+            // 3. Resetear el vendedor y cliente seleccionado si es necesario
+            VendedorSeleccionado = null;
+            BusquedaArticulo = string.Empty;
+
+            // 4. Notificar a la UI que los totales ahora son cero
+            OnPropertyChanged(nameof(Encabezado));
+
+            // Opcional: Mostrar un mensaje breve en la barra de estado
+            // _commonService.ShowMessage("Pantalla limpia para nueva venta.");
+        }
+
+        public void ActualizarTotales()
+        {
+            Encabezado.SubTotal = FacturaDetalle.Sum(x => x.SubTotal);
             Encabezado.Total = FacturaDetalle.Sum(x => x.Total);
             Encabezado.Impuesto = FacturaDetalle.Sum(x => x.Impuesto);
+            Encabezado.Descuento = FacturaDetalle.Sum(x => x.Descuento);
             
             OnPropertyChanged(nameof(Encabezado)); // Notifica a la UI
         }

@@ -4,6 +4,8 @@ namespace Aplicacion.Services.Factura
 {
     public interface IFacturaApplicationService
     {
-        FacturaResponse AgregarArticuloAFactura(AgregarArticuloRequest request);
+        FacturaResponse AgregarArticuloAFactura(FacturaRequest request);
+
+        FacturaResponse CalcularFacturaDetalle(FacturaRequest request);
     }
 }

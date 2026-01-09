@@ -19,7 +19,7 @@ namespace Aplicacion.Services.Factura
             _facturaServicioDominio = facturaServicioDominio;
         }
 
-        public FacturaResponse AgregarArticuloAFactura(AgregarArticuloRequest request)
+        public FacturaResponse AgregarArticuloAFactura(FacturaRequest request)
         {
             List<string> articulos = request.FacturasDetalle.Select(r => r.ArticuloId).ToList();
             articulos.Add(request.ArticuloId);
@@ -40,7 +40,7 @@ namespace Aplicacion.Services.Factura
             Vendedor vendedor = new Vendedor
             {
                 VendedorId = request.Vendedor.VendedorId,
-                Nombre = request.Vendedor?.Nombre
+                Nombre = request?.Vendedor?.Nombre
             };
 
             List<FacturaDetalle> facturasDetalleEntidad = MapFacturaDetalleDeDtoAEntidad(request.FacturasDetalle, articulosEntidad);
@@ -127,6 +127,24 @@ namespace Aplicacion.Services.Factura
             }).ToList();
         }
 
+        public FacturaResponse CalcularFacturaDetalle(FacturaRequest request)
+        {
+            List<string> articulos = request.FacturasDetalle.Select(r => r.ArticuloId).ToList();
 
+            List<int> vendedores = request.FacturasDetalle.Select(r => r.VendedorId).ToList();
+
+            IEnumerable<Articulo> articulosEntidad = _genericRepository.GetFiltered<Articulo>(r => articulos.Contains(r.ArticuloId));
+
+            IEnumerable<Vendedor> VendedoresEntidad = _genericRepository.GetFiltered<Vendedor>(r => vendedores.Contains(r.VendedorId));
+
+            List<FacturaDetalle> facturasDetallEntidad = MapFacturaDetalleDeDtoAEntidad(request.FacturasDetalle, articulosEntidad);
+
+            facturasDetallEntidad = _facturaServicioDominio.CalcularFacturasDetalle(facturasDetallEntidad, articulosEntidad, VendedoresEntidad);
+
+            return new FacturaResponse
+            {
+                FacturaDetalle = MapFacturaDetalleDeEntidadADto(facturasDetallEntidad)
+            };
+        }
     }
 }

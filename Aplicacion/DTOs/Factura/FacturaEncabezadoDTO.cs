@@ -8,7 +8,9 @@
         public string ClienteId { get; set; }
         public int CajeroId { get; set; }
         public decimal Total { get; set; }
+        public decimal SubTotal { get; set; }
         public decimal Impuesto { get; set; }
+        public decimal Descuento { get; set; }
         public string Comentario { get; set; }
         public string NumeroReferencia { get; set; }
         public string CampoPersonalizado1 { get; set; }

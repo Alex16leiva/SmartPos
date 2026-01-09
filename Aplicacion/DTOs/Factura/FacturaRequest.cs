@@ -2,11 +2,7 @@
 
 namespace Aplicacion.DTOs.Factura
 {
-    public class FacturaRequest
-    {
-    }
-
-    public class AgregarArticuloRequest : RequestBase
+    public class FacturaRequest : RequestBase
     {
         public string ArticuloId { get; set; }
         public VendedorDTO Vendedor { get; set; }
