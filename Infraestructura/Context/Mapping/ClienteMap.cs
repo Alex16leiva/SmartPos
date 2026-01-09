@@ -12,7 +12,7 @@ namespace Infraestructura.Context.Mapping
         
             builder.ToTable("Cliente", "dbo");
             builder.HasKey(r => r.NumeroCuenta);
-            builder.Property(r => r.Id).HasColumnName("Id").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            builder.Property(r => r.Id).HasColumnName("Id").IsRequired().HasComputedColumnSql();
             builder.Property(r => r.NumeroCuenta).HasColumnName("NumeroCuenta").IsRequired().HasMaxLength(30);
             builder.Property(r => r.Nombre).HasColumnName("Nombre").IsRequired().HasMaxLength(40);
             builder.Property(r => r.Apellido).HasColumnName("Apellido").HasMaxLength(50);

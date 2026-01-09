@@ -2,6 +2,6 @@
 {
     public class BatchRequest : RequestBase
     {
-        public int CajaId { get; set; }
+        public BatchDTO Batch { get; set; }
     }
 }

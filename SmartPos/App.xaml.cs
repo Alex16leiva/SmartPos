@@ -1,7 +1,10 @@
 ﻿using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
 using Aplicacion.Services.Factura;
+using Aplicacion.Services.Finanzas;
 using Aplicacion.Services.VendedorSevices;
+using CrossCutting.Identity;
+using CrossCutting.Network.Identity;
 using Dominio.Context.Services;
 using Infraestructura.Context;
 using Infraestructura.Core.Logging;
@@ -84,9 +87,23 @@ namespace SmartPos
             services.AddScoped<IFacturaApplicationService, FacturaApplicationService>();
             services.AddScoped<IFacturaServicioDominio, FacturaServicioDominio>();
             services.AddScoped<IVendedorApplicationService, VendedorApplicationService>();
+            services.AddScoped<IFinanzasApplicationService, FinanzasApplicationService>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
             services.AddApplicationServicesWithInterceptors();
+
+
+            // 9. Configuración del Generador de Identidades (Correlativos)
+            // Registramos el generador que hereda de IIdentityFactory
+            // En tu caso, basándome en tu arquitectura, la clase suele llamarse 'IdentityGeneratorFactory'
+            services.AddSingleton<IIdentityFactory, ADOIdentityGeneratorFactory>();
+
+            // Construimos un contenedor temporal para inicializar la clase estática
+            var serviceProvider = services.BuildServiceProvider();
+            var identityGenerator = serviceProvider.GetRequiredService<IIdentityFactory>();
+
+            // ESTO ES LO QUE FALTA: Conectas la instancia con la clase estática para que deje de ser nula
+            IdentityFactory.SetCurrent(identityGenerator);
         }
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

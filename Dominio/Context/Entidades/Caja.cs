@@ -1,5 +1,6 @@
 ﻿using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dominio.Context.Entidades
 {
@@ -16,7 +17,7 @@ namespace Dominio.Context.Entidades
         public bool HabilitarImpresora2 { get; set; }
         public string NombreCashDrawer { get; set; }
         public bool HabilitarCashDrawer { get; set; }
-
+        [ForeignKey("BatchId")]
         public virtual ICollection<Batch> Batches { get; set; }
 
         public void AgregarBatch(Batch nuevoBatch)

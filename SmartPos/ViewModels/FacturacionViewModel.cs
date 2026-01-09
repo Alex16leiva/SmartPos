@@ -1,9 +1,11 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
 using Aplicacion.DTOs.Factura;
+using Aplicacion.DTOs.Finanzas;
 using Aplicacion.DTOs.Vendedores;
 using Aplicacion.Services.ArticuloServices;
 using Aplicacion.Services.Factura;
+using Aplicacion.Services.Finanzas;
 using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,6 +28,7 @@ namespace SmartPos.ViewModels
 
         [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
         [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado;
+        [ObservableProperty] private BatchDTO _batchActual;
         [ObservableProperty] private string _textoBusquedaModal = string.Empty;
         [ObservableProperty] private bool _isBusy;
 
@@ -47,6 +50,7 @@ namespace SmartPos.ViewModels
             _scopeFactory = scopeFactory;
 
             CargarVendedoresAsync();
+            ObtenerBatch();
         }
 
         public void CargarVendedoresAsync()
@@ -239,6 +243,26 @@ namespace SmartPos.ViewModels
             Encabezado.Descuento = FacturaDetalle.Sum(x => x.Descuento);
             
             OnPropertyChanged(nameof(Encabezado)); // Notifica a la UI
+        }
+
+        private async Task ObtenerBatch()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var finanzasService = scope.ServiceProvider.GetRequiredService<IFinanzasApplicationService>();
+
+                var request = new BatchRequest
+                {
+                    
+                    RequestUserInfo = _commonService.GetRequestInfo()
+                };
+
+                // El servicio se encarga de buscar el actual o crear el "BC0000000X"
+                var _batchActual = await finanzasService.ObtenerBatch(request);
+
+                // Guardamos el BatchId para usarlo en la facturación y el Diario
+                BatchActual = _batchActual;
+            }
         }
     }
 }

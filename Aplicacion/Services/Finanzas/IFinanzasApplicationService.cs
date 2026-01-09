@@ -4,6 +4,7 @@ namespace Aplicacion.Services.Finanzas
 {
     public interface IFinanzasApplicationService
     {
-        Task<BatchDTO> ObtenerOBuscarBatchActivoAsync(BatchRequest request);
+        Task<BatchDTO> CrearBatch(BatchRequest request);
+        Task<BatchDTO> ObtenerBatch(BatchRequest request);
     }
 }

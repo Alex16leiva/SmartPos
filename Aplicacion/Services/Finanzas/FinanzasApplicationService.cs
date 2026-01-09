@@ -2,6 +2,7 @@
 using Aplicacion.Helpers;
 using Azure.Core;
 using CrossCutting.Identity;
+using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core;
 using Dominio.Core.Extensions;
@@ -18,13 +19,24 @@ namespace Aplicacion.Services.Finanzas
             _genericRepository = genericRepository;
         }
 
-        public async Task<BatchDTO> ObtenerOBuscarBatchActivoAsync(BatchRequest request)
+        public async Task<BatchDTO> ObtenerBatch(BatchRequest request)
+        {
+            var includes = new List<string> { "Batch" };
+            var caja = await _genericRepository.GetSingleAsync<Caja>(b => b.CajaId == request.RequestUserInfo.Caja, includes);
+            if (caja.IsNotNull() && caja.BatchId.HasValue())
+            {
+                Batch batch = caja.Batches.FirstOrDefault(r => r.BatchId == caja.BatchId);
+                return MapBatchEntidadADto(batch);
+            }
+
+            var nuevoBatch = await CrearBatch(request);
+            return nuevoBatch;
+        }
+
+        public async Task<BatchDTO> CrearBatch(BatchRequest request)
         {
             // 1. Buscar si hay uno abierto
-            var batchActual = await _genericRepository.GetSingleAsync<Batch>(b => b.CajaId == request.CajaId && b.Estado == "Nuevo");
-
-            if (batchActual.IsNotNull())
-                return MapBatchEntidadADto(batchActual);
+            var caja = await _genericRepository.GetSingleAsync<Caja>(b => b.CajaId == request.RequestUserInfo.Caja);
 
             // 2. Si no existe, crear el nuevo lote (Transacción única)
             var nuevoBatchId = IdentityFactory.CreateIdentity().NextCorrelativeIdentity("BC");
@@ -32,7 +44,7 @@ namespace Aplicacion.Services.Finanzas
             var nuevoBatch = new Batch
             {
                 BatchId = nuevoBatchId,
-                CajaId = request.CajaId,
+                CajaId = caja.CajaId,
                 Estado = "Nuevo",
                 FechaApertura = DateTime.Now,
                 SubTotal = 0,
@@ -40,7 +52,9 @@ namespace Aplicacion.Services.Finanzas
                 CantidadClientes = 0
             };
 
-            _genericRepository.Add(nuevoBatch);
+            caja.ActualizarInfoBatch(nuevoBatchId);
+            caja.AgregarBatch(nuevoBatch);
+
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("AgregarRol");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
 

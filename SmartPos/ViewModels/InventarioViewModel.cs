@@ -1,7 +1,9 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
+using Aplicacion.DTOs.Finanzas;
 using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
+using Aplicacion.Services.Finanzas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Core.Extensions;
@@ -266,6 +268,8 @@ namespace SmartPos.ViewModels
 
             return queryInfo;
         }
+
+        
     }
 }
 
