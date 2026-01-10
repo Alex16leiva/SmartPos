@@ -1,11 +1,13 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
+using Aplicacion.DTOs.Clientes;
 using Aplicacion.DTOs.ConfiTienda;
 using Aplicacion.DTOs.Factura;
 using Aplicacion.DTOs.Finanzas;
 using Aplicacion.DTOs.FormasPagos;
 using Aplicacion.DTOs.Vendedores;
 using Aplicacion.Services.ArticuloServices;
+using Aplicacion.Services.ClienteServices;
 using Aplicacion.Services.ConfiTienda;
 using Aplicacion.Services.Factura;
 using Aplicacion.Services.Finanzas;
@@ -30,7 +32,6 @@ namespace SmartPos.ViewModels
     {
         [ObservableProperty] private ObservableCollection<FacturaDetalleDTO> _facturaDetalle = new();
         [ObservableProperty] private FacturaEncabezadoDTO _encabezado = new();
-        [ObservableProperty] private string _busquedaArticulo = string.Empty;
 
         [ObservableProperty] private BatchDTO _batchActual;
         [ObservableProperty] private ObservableCollection<FormasPagoDTO> _formasPago = new();
@@ -49,13 +50,20 @@ namespace SmartPos.ViewModels
 
         // Propiedades de Paginación de Articulos
         [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
-        [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado;
+        [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado = new();
+        [ObservableProperty] private string _busquedaArticulo = string.Empty;
         [ObservableProperty] private int _paginaActual = 1;
         [ObservableProperty] private int _totalPaginas = 0;
         [ObservableProperty] private int _registrosPorPagina = 10;
         private CancellationTokenSource? _searchCts;
 
-        [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes;
+        // Propiedades relacionadas al Cliente
+        [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes = new();
+        [ObservableProperty] private ClienteDTO _clienteSeleccionado = new();
+        [ObservableProperty] private int _paginaActualClientes = 1;
+        [ObservableProperty] private int _totalPaginasClientes = 0;
+        [ObservableProperty] private string _clientesBusqueda = string.Empty;
+        [ObservableProperty] private bool _clienteTieneCredito = false;
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommonService _commonService;
@@ -67,6 +75,7 @@ namespace SmartPos.ViewModels
             CargarVendedoresAsync();
             ObtenerBatch();
             CargarFormasPago();
+            ObtenerConfiguracionTiendas();
         }
 
         public void CargarVendedoresAsync()
@@ -285,6 +294,38 @@ namespace SmartPos.ViewModels
             }
         }
 
+        public async Task LoadDataClientesAsync()
+        {
+            IsBusy = true;
+
+            var request = new ClienteRequest // Asegúrate de que herede de BaseRequest o use QueryInfo
+            {
+                QueryInfo = new QueryInfo
+                {
+                    PageIndex = PaginaActualClientes - 1,
+                    PageSize = RegistrosPorPagina,
+                    SortFields = new List<string> { "Nombre" },
+                    Ascending = true,
+                    Predicate = !string.IsNullOrWhiteSpace(TextoBusquedaModal)
+                                ? "ClienteId.ToString().Contains(@0) OR Nombre.Contains(@0) OR Identificacion.Contains(@0)"
+                                : string.Empty,
+                    ParamValues = !string.IsNullOrWhiteSpace(TextoBusquedaModal)
+                                  ? new object[] { TextoBusquedaModal }
+                                  : Array.Empty<object>()
+                }
+            };
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var clienteService = scope.ServiceProvider.GetRequiredService<IClienteApplicationService>();
+                var result = clienteService.ObtenerCliente(request);
+
+                Clientes = new ObservableCollection<ClienteDTO>(result.Items);
+                TotalPaginasClientes = result.PageCount;
+            }
+            IsBusy = false;
+        }
+
         public void MostrarVentanaDePago()
         {
             if (EsUnCobroValido())
@@ -294,7 +335,7 @@ namespace SmartPos.ViewModels
                 ClienteTieneCredito = ClienteSeleccionado != null ? ClienteSeleccionado.TieneCredito : false;
                 ObtenerFormaPago(ClienteTieneCredito);
                 
-                new CobrosView().ShowDialog();
+                //new CobrosView().ShowDialog();
             }
         }
 

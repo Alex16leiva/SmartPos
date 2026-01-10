@@ -1,7 +1,6 @@
 ﻿using Dominio.Context.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Infraestructura.Context.Mapping
 {

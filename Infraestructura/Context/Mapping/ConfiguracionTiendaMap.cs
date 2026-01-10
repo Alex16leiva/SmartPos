@@ -29,7 +29,7 @@ namespace Infraestructura.Contexto.Mapping
             builder.Property(r => r.Personalizado1).HasColumnName("Personalizado1").IsUnicode(false).HasMaxLength(50);
             builder.Property(r => r.Personalizado2).HasColumnName("Personalizado2").IsUnicode(false).HasMaxLength(50);
             builder.Property(r => r.Personalizado3).HasColumnName("Personalizado3").IsUnicode(false).HasMaxLength(50);
-            Property(r => r.Personalizado4).HasColumnName("Personalizado4").IsUnicode(false).HasMaxLength(50);
+            builder.Property(r => r.Personalizado4).HasColumnName("Personalizado4").IsUnicode(false).HasMaxLength(50);
         
             base.Configure(builder);
         }
