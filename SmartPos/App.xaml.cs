@@ -1,7 +1,9 @@
 ﻿using Aplicacion.Services;
 using Aplicacion.Services.ArticuloServices;
+using Aplicacion.Services.ConfiTienda;
 using Aplicacion.Services.Factura;
 using Aplicacion.Services.Finanzas;
+using Aplicacion.Services.FPagos;
 using Aplicacion.Services.VendedorSevices;
 using CrossCutting.Identity;
 using CrossCutting.Network.Identity;
@@ -88,6 +90,8 @@ namespace SmartPos
             services.AddScoped<IFacturaServicioDominio, FacturaServicioDominio>();
             services.AddScoped<IVendedorApplicationService, VendedorApplicationService>();
             services.AddScoped<IFinanzasApplicationService, FinanzasApplicationService>();
+            services.AddScoped<IConfiguracionTiendaApplicationService, ConfiguracionTiendaApplicationService>();
+            services.AddScoped<IFormasPagoApplicationService, FormasPagoApplicationService>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
             services.AddApplicationServicesWithInterceptors();

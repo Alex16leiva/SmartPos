@@ -21,7 +21,7 @@ namespace Aplicacion.Services.Finanzas
 
         public async Task<BatchDTO> ObtenerBatch(BatchRequest request)
         {
-            var includes = new List<string> { "Batch" };
+            var includes = new List<string> { "Batches" };
             var caja = await _genericRepository.GetSingleAsync<Caja>(b => b.CajaId == request.RequestUserInfo.Caja, includes);
             if (caja.IsNotNull() && caja.BatchId.HasValue())
             {

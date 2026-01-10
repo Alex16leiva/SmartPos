@@ -1,18 +1,24 @@
 ﻿using Aplicacion.DTOs;
 using Aplicacion.DTOs.Articulos;
+using Aplicacion.DTOs.ConfiTienda;
 using Aplicacion.DTOs.Factura;
 using Aplicacion.DTOs.Finanzas;
+using Aplicacion.DTOs.FormasPagos;
 using Aplicacion.DTOs.Vendedores;
 using Aplicacion.Services.ArticuloServices;
+using Aplicacion.Services.ConfiTienda;
 using Aplicacion.Services.Factura;
 using Aplicacion.Services.Finanzas;
+using Aplicacion.Services.FPagos;
 using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.FacturaAgg;
+using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml.Drawing;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using SmartPos.Views;
@@ -26,21 +32,30 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private FacturaEncabezadoDTO _encabezado = new();
         [ObservableProperty] private string _busquedaArticulo = string.Empty;
 
-        [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
-        [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado;
         [ObservableProperty] private BatchDTO _batchActual;
+        [ObservableProperty] private ObservableCollection<FormasPagoDTO> _formasPago = new();
+        [ObservableProperty]private ObservableCollection<FormasPagoDTO> _formasDePagoOriginal = new();
         [ObservableProperty] private string _textoBusquedaModal = string.Empty;
         [ObservableProperty] private bool _isBusy;
 
         [ObservableProperty] private ObservableCollection<VendedorDTO> _vendedores = new();
         [ObservableProperty] private VendedorDTO _vendedorSeleccionado = new();
-        
 
-        // Propiedades de Paginación
+        [ObservableProperty] private ConfiguracionTiendaDTO _configuracionTiendaSeleccionada = new();
+
+        [ObservableProperty]private decimal _cambio;
+        [ObservableProperty]private decimal _totalCobro;
+        [ObservableProperty]public decimal _totalMostrar;
+
+        // Propiedades de Paginación de Articulos
+        [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
+        [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado;
         [ObservableProperty] private int _paginaActual = 1;
         [ObservableProperty] private int _totalPaginas = 0;
         [ObservableProperty] private int _registrosPorPagina = 10;
         private CancellationTokenSource? _searchCts;
+
+        [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes;
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommonService _commonService;
@@ -51,6 +66,7 @@ namespace SmartPos.ViewModels
 
             CargarVendedoresAsync();
             ObtenerBatch();
+            CargarFormasPago();
         }
 
         public void CargarVendedoresAsync()
@@ -243,6 +259,81 @@ namespace SmartPos.ViewModels
             Encabezado.Descuento = FacturaDetalle.Sum(x => x.Descuento);
             
             OnPropertyChanged(nameof(Encabezado)); // Notifica a la UI
+        }
+
+        public async Task CargarFormasPago()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var maestroService = scope.ServiceProvider.GetRequiredService<IFormasPagoApplicationService>();
+                var result = maestroService.ObtenerFormasDePago(new FormaPagoRequest { });
+                FormasDePagoOriginal = new ObservableCollection<FormasPagoDTO>(result);
+            }
+        }
+
+        private void ObtenerConfiguracionTiendas()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var configuracionTiendaApplication = scope.ServiceProvider.GetRequiredService<IConfiguracionTiendaApplicationService>();
+                ConfiguracionTiendaSeleccionada = configuracionTiendaApplication.ObtenerConfiguracionTienda(new ConfiguracionTiendaRequest { EsAdminPos = true  });
+
+                if (ConfiguracionTiendaSeleccionada.Message.HasValue())
+                {
+                    _commonService.ShowWarning(ConfiguracionTiendaSeleccionada.Message);
+                }
+            }
+        }
+
+        public void MostrarVentanaDePago()
+        {
+            if (EsUnCobroValido())
+            {
+                TotalMostrar = Math.Round(FacturaDetalle.Sum(r => r.Total), 2);
+                
+                ClienteTieneCredito = ClienteSeleccionado != null ? ClienteSeleccionado.TieneCredito : false;
+                ObtenerFormaPago(ClienteTieneCredito);
+                
+                new CobrosView().ShowDialog();
+            }
+        }
+
+        private bool EsUnCobroValido()
+        {
+            //if (RecibirPagoAFacturaDeCredito)
+            //{
+            //    return true;
+            //}
+
+            if (FacturaDetalle.IsEmpty())
+            {
+                _commonService.ShowWarning("No hay articulos a facturar");
+                return false;
+            }
+            var tieneCantidadConCero = FacturaDetalle.Where(r => r.Cantidad == 0);
+            if (tieneCantidadConCero.HasItems())
+            {
+                _commonService.ShowWarning("Tiene articulos con cantidad cero");
+                return false;
+            }
+            return true;
+        }
+
+        private void ObtenerFormaPago(bool esCobroCredito)
+        {
+            FormasPago = new ObservableCollection<FormasPagoDTO>(FormasDePagoOriginal);
+            FormasPago.ToList().ForEach(r => r.Cobro = 0);
+            FormasPago.ToList().ForEach(r => r.MostrarCobro = 0);
+
+            if (!esCobroCredito)
+            {
+                //escredito
+                List<FormasPagoDTO> formasDePagoCredito = FormasPago.Where(r => r.TipoPago == 2).ToList();
+                foreach (var item in formasDePagoCredito)
+                {
+                    FormasPago.Remove(item);
+                }
+            }
         }
 
         private async Task ObtenerBatch()

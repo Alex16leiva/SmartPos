@@ -9,6 +9,7 @@ using Infraestructura.Context.Mapping.Articulos;
 using Infraestructura.Context.Mapping.Factura;
 using Infraestructura.Context.Mapping.Seguridad;
 using Infraestructura.Context.Mapping.Vendedores;
+using Infraestructura.Contexto.Mapping;
 using Infraestructura.Contexto.Mapping.Factura;
 using Infraestructura.Contexto.Mapping.Finanzas;
 using Infraestructura.Core;
@@ -34,16 +35,17 @@ namespace Infraestructura.Context
         public virtual DbSet<FacturaEncabezado> FacturaEncabezado { get; set; }
         public virtual DbSet<FacturaDetalle> FacturaDetalle { get; set; }
         public virtual DbSet<Vendedor> Vendedor { get; set; }
-        public virtual Batch Batch { get; set; }
-        public virtual Caja Caja { get; set; }
-        public virtual Diario Diario { get; set; }
-        public virtual CuentasPorCobrar CuentasPorCobrar { get; set; }
-        public virtual FormaPagoDetalle FormaPagoDetalle { get; set; }
-        public virtual CuentasPorCobrarHistorial CuentasPorCobrarHistorial { get; set; }
-        public virtual Cliente Cliente { get; set; }
-        public virtual TipoCuenta TipoCuenta { get; set; }
-        public virtual FormasPago FormasPago { get; set; }
-        public virtual RegimenFiscal RegimenFiscal { get; set; }
+        public virtual DbSet<Batch> Batch { get; set; }
+        public virtual DbSet<Caja> Caja { get; set; }
+        public virtual DbSet<Diario> Diario { get; set; }
+        public virtual DbSet<CuentasPorCobrar> CuentasPorCobrar { get; set; }
+        public virtual DbSet<FormaPagoDetalle> FormaPagoDetalle { get; set; }
+        public virtual DbSet<CuentasPorCobrarHistorial> CuentasPorCobrarHistorial { get; set; }
+        public virtual DbSet<Cliente> Cliente { get; set; }
+        public virtual DbSet<TipoCuenta> TipoCuenta { get; set; }
+        public virtual DbSet<FormasPago> FormasPago { get; set; }
+        public virtual DbSet<RegimenFiscal> RegimenFiscal { get; set; }
+        public virtual DbSet<ConfiguracionTienda> ConfiguracionTienda { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +68,7 @@ namespace Infraestructura.Context
             modelBuilder.ApplyConfiguration(new TipoCuentaMap());
             modelBuilder.ApplyConfiguration(new FormasPagoMap());
             modelBuilder.ApplyConfiguration(new RegimenFiscalMap());
+            modelBuilder.ApplyConfiguration(new ConfiguracionTiendaMap());
 
             base.OnModelCreating(modelBuilder);
         }
