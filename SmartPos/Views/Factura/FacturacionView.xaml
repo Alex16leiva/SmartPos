@@ -179,7 +179,8 @@
     <Border BorderBrush="#DEE2E6" BorderThickness="1" Margin="1">
         <Button Content="Fijar Cliente" 
                 Style="{StaticResource MahApps.Styles.Button.Flat}"
-                Background="White"
+                Background="White" 
+                Command="{Binding AbrirBusquedaClientesCommand}"
                 mah:ControlsHelper.ContentCharacterCasing="Normal"/>
     </Border>
 

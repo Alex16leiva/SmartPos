@@ -36,7 +36,6 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private BatchDTO _batchActual;
         [ObservableProperty] private ObservableCollection<FormasPagoDTO> _formasPago = new();
         [ObservableProperty]private ObservableCollection<FormasPagoDTO> _formasDePagoOriginal = new();
-        [ObservableProperty] private string _textoBusquedaModal = string.Empty;
         [ObservableProperty] private bool _isBusy;
 
         [ObservableProperty] private ObservableCollection<VendedorDTO> _vendedores = new();
@@ -52,6 +51,7 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private ObservableCollection<ArticulosDTO> _articulosBusqueda = new();
         [ObservableProperty] private ArticulosDTO? _articuloBusquedaSeleccionado = new();
         [ObservableProperty] private string _busquedaArticulo = string.Empty;
+        [ObservableProperty] private string _textoBusquedaModal = string.Empty;
         [ObservableProperty] private int _paginaActual = 1;
         [ObservableProperty] private int _totalPaginas = 0;
         [ObservableProperty] private int _registrosPorPagina = 10;
@@ -60,6 +60,7 @@ namespace SmartPos.ViewModels
         // Propiedades relacionadas al Cliente
         [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes = new();
         [ObservableProperty] private ClienteDTO _clienteSeleccionado = new();
+        [ObservableProperty] private string _clienteBusqueda = string.Empty;
         [ObservableProperty] private int _paginaActualClientes = 1;
         [ObservableProperty] private int _totalPaginasClientes = 0;
         [ObservableProperty] private string _clientesBusqueda = string.Empty;
@@ -292,6 +293,42 @@ namespace SmartPos.ViewModels
                     _commonService.ShowWarning(ConfiguracionTiendaSeleccionada.Message);
                 }
             }
+        }
+
+        [RelayCommand]
+        public async Task BuscarClientes()
+        {
+            PaginaActualClientes = 1; // Resetear al buscar
+            await LoadDataClientesAsync();
+        }
+
+        [RelayCommand]
+        public void SeleccionarCliente()
+        {
+            if (ClienteSeleccionado != null)
+            {
+                 
+            }
+        }
+
+        [RelayCommand]
+        public async Task AbrirBusquedaClientes()
+        {
+            // 1. Cargamos la primera página de clientes antes de mostrar la ventana
+            PaginaActualClientes = 1;
+            await LoadDataClientesAsync();
+
+            // 2. Instanciamos la vista
+            var ventanaClientes = new ClientesBusquedaView
+            {
+                // Importante: Compartimos el DataContext para que la ventana 
+                // use las propiedades y comandos que ya definimos en este VM
+                DataContext = this,
+
+            };
+
+            // 3. La mostramos como diálogo (bloquea la factura hasta elegir cliente)
+            ventanaClientes.ShowDialog();
         }
 
         public async Task LoadDataClientesAsync()

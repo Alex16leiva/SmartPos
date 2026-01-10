@@ -22,58 +22,66 @@ namespace Aplicacion.Services.ClienteServices
             DynamicFilter dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
             dynamicFilter.Includes = new List<string>();
             dynamicFilter.Includes.Add("TipoCuenta");
-
-            PagedCollection cliente = _genericRepository.GetPagedAndFiltered<Cliente>(dynamicFilter);
-
-            return new SearchResult<ClienteDTO>
+            try
             {
-                PageCount = cliente.PageCount,
-                ItemCount = cliente.ItemCount,
-                PageIndex = cliente.PageIndex,
-                TotalItems = cliente.TotalItems,
-                Items = (from qry in cliente.Items as IEnumerable<Cliente>
-                         select new ClienteDTO
-                         {
-                             AhorrosTotales = qry.AhorrosTotales,
-                             Apellido = qry.Apellido,
-                             AperturaCuenta = qry.AperturaCuenta,
-                             Ciudad = qry.Ciudad,
-                             Compania = qry.Compania,
-                             CorreoElectronico = qry.CorreoElectronico,
-                             Departamento = qry.Departamento,
-                             DescuentoActual = qry.DescuentoActual,
-                             Direccion = qry.Direccion,
-                             Direccion2 = qry.Direccion2,
-                             Empleado = qry.Empleado,
-                             FotoRuta = qry.FotoRuta,
-                             Id = qry.Id,
-                             LimiteCredito = qry.LimiteCredito,
-                             NivelPrecio = qry.NivelPrecio,
-                             Nombre = qry.Nombre,
-                             Notas = qry.Notas,
-                             NumeroCuenta = qry.NumeroCuenta,
-                             NumeroFax = qry.NumeroFax,
-                             NumeroPersonalizado1 = qry.NumeroPersonalizado1,
-                             NumeroPersonalizado2 = qry.NumeroPersonalizado2,
-                             NumeroPersonalizado3 = qry.NumeroPersonalizado3,
-                             NumeroPersonalizado4 = qry.NumeroPersonalizado4,
-                             NumeroPersonalizado5 = qry.NumeroPersonalizado5,
-                             NumeroTelefono1 = qry.NumeroTelefono1,
-                             NumeroTelefono2 = qry.NumeroTelefono2,
-                             Pais = qry.Pais,
-                             SaldoCuenta = qry.SaldoCuenta,
-                             TextoPersonalizado1 = qry.TextoPersonalizado1,
-                             TextoPersonalizado2 = qry.TextoPersonalizado2,
-                             TextoPersonalizado3 = qry.TextoPersonalizado3,
-                             TextoPersonalizado4 = qry.TextoPersonalizado4,
-                             TextoPersonalizado5 = qry.TextoPersonalizado5,
-                             TipoCuentaID = qry.TipoCuentaID,
-                             TotalVisitas = qry.TotalVisitas,
-                             UltimaVisita = qry.UltimaVisita,
-                             VentasTotales = qry.VentasTotales,
-                             TieneCredito = qry.TieneCredito()
-                         }).ToList()
-            };
+                PagedCollection cliente = _genericRepository.GetPagedAndFiltered<Cliente>(dynamicFilter);
+
+                return new SearchResult<ClienteDTO>
+                {
+                    PageCount = cliente.PageCount,
+                    ItemCount = cliente.ItemCount,
+                    PageIndex = cliente.PageIndex,
+                    TotalItems = cliente.TotalItems,
+                    Items = (from qry in cliente.Items as IEnumerable<Cliente>
+                             select new ClienteDTO
+                             {
+                                 AhorrosTotales = qry.AhorrosTotales,
+                                 Apellido = qry.Apellido,
+                                 AperturaCuenta = qry.AperturaCuenta,
+                                 Ciudad = qry.Ciudad,
+                                 Compania = qry.Compania,
+                                 CorreoElectronico = qry.CorreoElectronico,
+                                 Departamento = qry.Departamento,
+                                 DescuentoActual = qry.DescuentoActual,
+                                 Direccion = qry.Direccion,
+                                 Direccion2 = qry.Direccion2,
+                                 Empleado = qry.Empleado,
+                                 FotoRuta = qry.FotoRuta,
+                                 Id = qry.Id,
+                                 LimiteCredito = qry.LimiteCredito,
+                                 NivelPrecio = qry.NivelPrecio,
+                                 Nombre = qry.Nombre,
+                                 Notas = qry.Notas,
+                                 NumeroCuenta = qry.NumeroCuenta,
+                                 NumeroFax = qry.NumeroFax,
+                                 NumeroPersonalizado1 = qry.NumeroPersonalizado1,
+                                 NumeroPersonalizado2 = qry.NumeroPersonalizado2,
+                                 NumeroPersonalizado3 = qry.NumeroPersonalizado3,
+                                 NumeroPersonalizado4 = qry.NumeroPersonalizado4,
+                                 NumeroPersonalizado5 = qry.NumeroPersonalizado5,
+                                 NumeroTelefono1 = qry.NumeroTelefono1,
+                                 NumeroTelefono2 = qry.NumeroTelefono2,
+                                 Pais = qry.Pais,
+                                 SaldoCuenta = qry.SaldoCuenta,
+                                 TextoPersonalizado1 = qry.TextoPersonalizado1,
+                                 TextoPersonalizado2 = qry.TextoPersonalizado2,
+                                 TextoPersonalizado3 = qry.TextoPersonalizado3,
+                                 TextoPersonalizado4 = qry.TextoPersonalizado4,
+                                 TextoPersonalizado5 = qry.TextoPersonalizado5,
+                                 TipoCuentaID = qry.TipoCuentaID,
+                                 TotalVisitas = qry.TotalVisitas,
+                                 UltimaVisita = qry.UltimaVisita,
+                                 VentasTotales = qry.VentasTotales,
+                                 TieneCredito = qry.TieneCredito()
+                             }).ToList()
+                };
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+            
         }
 
         public ClienteDTO CrearCliente(ClienteRequest request)
