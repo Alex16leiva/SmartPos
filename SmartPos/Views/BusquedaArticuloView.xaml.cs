@@ -19,14 +19,24 @@ namespace SmartPos.Views
 
         private void BtnSeleccionar_Click(object sender, RoutedEventArgs e)
         {
+            var viewModel = (FacturacionViewModel)this.DataContext;
+            if (viewModel.SeleccionarClienteCommand.CanExecute(null))
+            {
+                viewModel.SeleccionarClienteCommand.Execute(null);
+            }
+
             this.DialogResult = true;
             this.Close();
         }
 
+        // También es buena práctica añadir el doble clic
         private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            this.DialogResult = true;
-            this.Close();
+            var viewModel = (FacturacionViewModel)this.DataContext;
+            if (viewModel.SeleccionarClienteCommand.CanExecute(null))
+            {
+                viewModel.SeleccionarClienteCommand.Execute(null);
+            }
         }
     }
 }

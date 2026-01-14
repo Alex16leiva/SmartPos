@@ -23,7 +23,7 @@
                  FontSize="16" Margin="0,0,0,10"
                  mah:TextBoxHelper.AutoWatermark="True">
             <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{Binding ComandoBuscarClientes}"/>
+                <KeyBinding Key="Enter" Command="{Binding SeleccionarClienteCommand}"/>
             </TextBox.InputBindings>
         </TextBox>
 

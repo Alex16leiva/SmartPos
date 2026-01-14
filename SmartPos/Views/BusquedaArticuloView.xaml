@@ -31,6 +31,9 @@
                   IsReadOnly="True" 
                   SelectionMode="Single"
                   MouseDoubleClick="DataGrid_MouseDoubleClick">
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding SeleccionarClienteCommand}"/>
+            </DataGrid.InputBindings>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="CÓDIGO" Binding="{Binding ArticuloId}" Width="150"/>
                 <DataGridTextColumn Header="DESCRIPCIÓN" Binding="{Binding Descripcion}" Width="*"/>

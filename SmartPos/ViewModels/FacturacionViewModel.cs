@@ -15,12 +15,8 @@ using Aplicacion.Services.FPagos;
 using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Dominio.Context.Entidades;
-using Dominio.Context.Entidades.FacturaAgg;
-using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using OfficeOpenXml.Drawing;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using SmartPos.Views;
@@ -60,6 +56,7 @@ namespace SmartPos.ViewModels
         // Propiedades relacionadas al Cliente
         [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes = new();
         [ObservableProperty] private ClienteDTO _clienteSeleccionado = new();
+        [ObservableProperty] private string _nombreClienteActual = string.Empty;
         [ObservableProperty] private string _clienteBusqueda = string.Empty;
         [ObservableProperty] private int _paginaActualClientes = 1;
         [ObservableProperty] private int _totalPaginasClientes = 0;
@@ -242,6 +239,22 @@ namespace SmartPos.ViewModels
         }
 
         [RelayCommand]
+        public void SeleccionarCliente()
+        {
+            // 1. Verificación de seguridad
+            if (ClienteSeleccionado == null) return;
+
+            // 2. Asignación al encabezado de la factura
+            // Asegúrate de que Encabezado no sea nulo
+            if (Encabezado != null)
+            {
+                Encabezado.ClienteId = ClienteSeleccionado.NumeroCuenta;
+                // Si tienes una propiedad para mostrar el nombre en la UI:
+                NombreClienteActual = $"{ClienteSeleccionado.Nombre} {ClienteSeleccionado.Apellido}";
+            }
+        }
+
+        [RelayCommand]
         private void LimpiarPantalla()
         {
             // 1. Vaciar la colección de detalles
@@ -303,15 +316,6 @@ namespace SmartPos.ViewModels
         }
 
         [RelayCommand]
-        public void SeleccionarCliente()
-        {
-            if (ClienteSeleccionado != null)
-            {
-                 
-            }
-        }
-
-        [RelayCommand]
         public async Task AbrirBusquedaClientes()
         {
             // 1. Cargamos la primera página de clientes antes de mostrar la ventana
@@ -328,7 +332,14 @@ namespace SmartPos.ViewModels
             };
 
             // 3. La mostramos como diálogo (bloquea la factura hasta elegir cliente)
-            ventanaClientes.ShowDialog();
+            if (ventanaClientes.ShowDialog() == true)
+            {
+                if (ClienteSeleccionado != null)
+                {
+                    Encabezado.ClienteId = ClienteSeleccionado.NumeroCuenta;
+                    
+                }
+            }
         }
 
         public async Task LoadDataClientesAsync()
