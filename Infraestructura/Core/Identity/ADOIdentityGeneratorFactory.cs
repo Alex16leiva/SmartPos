@@ -1,20 +1,22 @@
 ﻿using CrossCutting.Identity;
+using Infraestructura.Core;
+using Microsoft.Extensions.Options;
 
 namespace CrossCutting.Network.Identity
 {
     public class ADOIdentityGeneratorFactory : IIdentityFactory
     {
-        #region Implementation of IIdentityFactory
+        private readonly string _connectionString;
 
-        /// <summary>
-        /// Create a new IIdentityGenerator.
-        /// </summary>
-        /// <returns>The IIdentityGenerator created.</returns>
-        public IIdentityGenerator Create()
+        public ADOIdentityGeneratorFactory(IOptions<DataBaseSetting> options)
         {
-            return new ADOIdentityGenerator();
+            _connectionString = options.Value.conectionDataBase;
         }
 
-        #endregion Implementation of IIdentityFactory
+        public IIdentityGenerator Create()
+        {
+            return new ADOIdentityGenerator(_connectionString);
+        }
     }
+
 }

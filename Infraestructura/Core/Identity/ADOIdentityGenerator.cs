@@ -13,15 +13,12 @@ namespace CrossCutting.Network.Identity
     {
         private const string ConnectionStringName = "conectionDataBase";
         private readonly string _connectionExceptionMessage = string.Format("exception_ConnectionStringNotFound", ConnectionStringName);
-        private readonly string _connectionString = "Server=DESKTOP-5RCL6C7\\SQLEXPRESS; initial Catalog=SmartPos; Integrated Security=True; TrustServerCertificate=true";
+        private readonly string _connectionString;
 
-        public ADOIdentityGenerator()
+        public ADOIdentityGenerator(string connectionString)
         {
-            
+            _connectionString = connectionString;
         }
-
-        #region Implementation of IIdentityGenerator
-
         /// <summary>
         /// Generates a new secuential transaction identities with GUIDs across system boundaries, ideal for databases.
         /// </summary>
@@ -230,7 +227,7 @@ namespace CrossCutting.Network.Identity
             }
         }
 
-        #endregion Implementation of IIdentityGenerator
+
 
         #region Private Methods
 
