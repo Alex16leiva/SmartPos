@@ -10,6 +10,7 @@ using CrossCutting.Identity;
 using CrossCutting.Network.Identity;
 using Dominio.Context.Services;
 using Infraestructura.Context;
+using Infraestructura.Core;
 using Infraestructura.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,7 @@ using SmartPos.ViewModels;
 using SmartPos.Views;
 using SmartPos.Views.Factura;
 using System.IO;
+using System.Runtime;
 using System.Windows;
 
 namespace SmartPos
@@ -57,6 +59,11 @@ namespace SmartPos
 
 
             string connectionString = configuration.GetConnectionString("conectionDataBase");
+            services.Configure<DataBaseSetting>(options =>
+            {
+                configuration.GetSection("DataBaseSetting").Bind(options);
+            });
+
             // 2. Base de Datos: Cambiamos a Scoped
             services.AddDbContext<SmartPostDbContext>(options =>
             {
@@ -106,10 +113,11 @@ namespace SmartPos
 
             // Construimos un contenedor temporal para inicializar la clase estática
             var serviceProvider = services.BuildServiceProvider();
-            var identityGenerator = serviceProvider.GetRequiredService<IIdentityFactory>();
+            
 
-            // ESTO ES LO QUE FALTA: Conectas la instancia con la clase estática para que deje de ser nula
-            IdentityFactory.SetCurrent(identityGenerator);
+            var identityFactory = serviceProvider.GetRequiredService<IIdentityFactory>();
+            IdentityFactory.SetCurrent(identityFactory);
+
         }
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

@@ -20,13 +20,11 @@ namespace Aplicacion.Services.ClienteServices
         public SearchResult<ClienteDTO> ObtenerCliente(ClienteRequest request)
         {
             DynamicFilter dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
-            dynamicFilter.Includes = new List<string>();
-            dynamicFilter.Includes.Add("TipoCuenta");
-            try
-            {
-                PagedCollection cliente = _genericRepository.GetPagedAndFiltered<Cliente>(dynamicFilter);
+            dynamicFilter.Includes = ["TipoCuenta"];
+            
+            PagedCollection cliente = _genericRepository.GetPagedAndFiltered<Cliente>(dynamicFilter);
 
-                return new SearchResult<ClienteDTO>
+            return new SearchResult<ClienteDTO>
                 {
                     PageCount = cliente.PageCount,
                     ItemCount = cliente.ItemCount,
@@ -75,13 +73,6 @@ namespace Aplicacion.Services.ClienteServices
                                  TieneCredito = qry.TieneCredito()
                              }).ToList()
                 };
-            }
-            catch (Exception e)
-            {
-
-                throw;
-            }
-            
         }
 
         public ClienteDTO CrearCliente(ClienteRequest request)
@@ -199,6 +190,11 @@ namespace Aplicacion.Services.ClienteServices
                     EsCredito = r.EsCredito,
                     Descripcion = r.Descripcion
                 }).ToList();
+        }
+
+        public ClienteDTO ObtenerClienteGenerico()
+        {
+            throw new NotImplementedException();
         }
     }
 }

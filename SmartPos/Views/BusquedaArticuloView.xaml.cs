@@ -29,7 +29,7 @@ namespace SmartPos.Views
             this.Close();
         }
 
-        // También es buena práctica añadir el doble clic
+        
         private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var viewModel = (FacturacionViewModel)this.DataContext;
@@ -37,6 +37,9 @@ namespace SmartPos.Views
             {
                 viewModel.SeleccionarClienteCommand.Execute(null);
             }
+
+            this.DialogResult = true;
+            this.Close();
         }
     }
 }

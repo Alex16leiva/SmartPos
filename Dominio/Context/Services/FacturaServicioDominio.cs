@@ -1,6 +1,7 @@
 ﻿using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.Articulos;
 using Dominio.Context.Entidades.FacturaAgg;
+using Dominio.Context.Entidades.Finanzas;
 
 namespace Dominio.Context.Services
 {
@@ -121,6 +122,158 @@ namespace Dominio.Context.Services
             CalcularTotales(facturasDetalle);
 
             return facturasDetalle;
+        }
+
+        public void CrearFactura(Batch batch, FacturaEncabezado facturaEncabezado, List<FacturaDetalle> facturaDetalle, List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente)
+        {
+            facturaEncabezado.AgregarFacturaDetalle(facturaDetalle);
+
+            if (facturaEncabezado.EsDevolucion)
+            {
+                batch.Devoluciones = (Math.Abs(batch.Devoluciones)) + (Math.Abs(facturaEncabezado.SubTotal)) * -1;
+                batch.Descuento = batch.Descuento - facturaEncabezado.Descuento;
+                facturaEncabezado.LlamadaTipo = "Devolucion";
+                batch.TotalFormaDePago += Math.Abs(facturaEncabezado.Total * -1);
+            }
+            else
+            {
+                batch.TotalVenta += facturaEncabezado.Total;
+                batch.SubTotal += facturaEncabezado.SubTotal;
+                batch.CambioTotal = (Math.Abs(batch.CambioTotal) + facturaEncabezado.Cambio) * -1;
+                batch.TotalFormaDePago += formasPago.Sum(r => r.Cobro);
+                batch.Descuento += facturaEncabezado.Descuento;
+            }
+
+            batch.Impuesto += facturaEncabezado.Impuesto;
+            batch.CantidadClientes++;
+            batch.CostoTotal += facturaDetalle.Sum(r => (r.Costo * r.Cantidad));
+            batch.CajaId = facturaEncabezado.CajaId;
+
+            List<FormaPagoDetalle> formaPagoDetalle = MaterializarFormaPagoDetalle(formasPago, batch, facturaEncabezado);
+            facturaEncabezado.AgregarFormaPagoDetalle(formaPagoDetalle);
+
+            Diario diario = MaterializarDiario(facturaEncabezado);
+
+            batch.AgregarDiario(diario);
+
+            ActulizarArticulos(facturaDetalle, articulos);
+            facturaEncabezado.FechaCreacion = DateTime.Now;
+            batch.AgregarFacturaEncabezado(facturaEncabezado);
+
+            if (cliente != null)
+            {
+                cliente.ActualizacionFacturacion(facturaEncabezado.Total, facturaEncabezado.Descuento);
+            }
+
+            if (FacturaTieneCredito(formasPago))
+            {
+                var totalCredito = formasPago.Where(r => r.TipoPago == 4).Sum(r => r.Cobro);
+
+                MaterializarCuentasPorCobrar(facturaEncabezado, totalCredito, batch, 0);
+
+                batch.VentasCredito += totalCredito;
+
+                cliente.SaldoCuenta += totalCredito;
+            }
+        }
+
+        private void MaterializarCuentasPorCobrar(FacturaEncabezado facturaEncabezado, decimal totalCredito, Batch batch, int diasVencimiento)
+        {
+            var fechaTransaccion = DateTime.Now;
+            var nuevoCuentaPorCobrar = new CuentasPorCobrar
+            {
+                Balance = totalCredito,
+                CantidadOriginal = totalCredito,
+                FechaDeVencimiento = fechaTransaccion.AddDays(diasVencimiento),
+                NumeroCuenta = facturaEncabezado.ClienteId,
+                NumeroFactura = facturaEncabezado.FacturaId,
+                Tipo = 0,
+                Fecha = fechaTransaccion
+            };
+
+            var nuevoCuentaPorCobrarHistorial = new CuentasPorCobrarHistorial
+            {
+                CuentasPorCobrar = nuevoCuentaPorCobrar,
+                BatchId = batch.BatchId,
+                Monto = totalCredito,
+                TipoDeHistorico = 0,
+                Fecha = fechaTransaccion,
+                Comentario = string.Empty
+            };
+
+            batch.AgregarCuentasPorCobrarHistorial(nuevoCuentaPorCobrarHistorial);
+
+            facturaEncabezado.AgregarCuentaPorCobrar(nuevoCuentaPorCobrar);
+        }
+
+
+        private bool FacturaTieneCredito(List<FormasPago> formasDePago)
+        {
+            var formaPagoCredito = formasDePago.Where(r => r.TipoPago == 4 && r.Cobro > 0);
+
+            return formaPagoCredito.Any();
+        }
+
+        private void ActulizarArticulos(List<FacturaDetalle> facturaDetalle, List<Articulo> articulos)
+        {
+            List<string> articulosProcesados = new List<string>();
+            foreach (var item in articulos)
+            {
+                string existeArticulo = articulosProcesados.FirstOrDefault(r => r == item.ArticuloId);
+                if (!string.IsNullOrWhiteSpace(existeArticulo)) continue;
+
+                item.Cantidad -= facturaDetalle.Where(r => r.ArticuloId == item.ArticuloId).Sum(r => r.Cantidad);
+                articulosProcesados.Add(item.ArticuloId);
+            }
+        }
+
+        private Diario MaterializarDiario(FacturaEncabezado facturaEncabezado)
+        {
+            return new Diario
+            {
+                BatchId = facturaEncabezado.BatchId,
+                CajaId = facturaEncabezado.CajaId,
+                Referencia = facturaEncabezado.FacturaId,
+                TipoTransaccionId = "Factura"
+            };
+        }
+
+        private List<FormaPagoDetalle> MaterializarFormaPagoDetalle(List<FormasPago> formasPagos, Batch batch, FacturaEncabezado facturaEncabezado)
+        {
+            List<FormaPagoDetalle> formaPagoDetalle = new List<FormaPagoDetalle>();
+
+            List<FormasPago> formasPagoRecibeCobro = formasPagos.Where(r => r.Cobro > 0).ToList();
+
+            foreach (var item in formasPagoRecibeCobro)
+            {
+                FormaPagoDetalle nuevoFormaPagoDetalle = new FormaPagoDetalle
+                {
+                    BatchId = batch.BatchId,
+                    FacturaId = facturaEncabezado.FacturaId,
+                    FormaPagoId = item.FormaPagoId,
+                    Descripcion = item.Descripcion,
+                    Monto = item.Cobro,
+                    MontoExtranjero = item.MostrarCobro,
+                    PagoId = string.Empty
+                };
+                formaPagoDetalle.Add(nuevoFormaPagoDetalle);
+            }
+
+            if (facturaEncabezado.Cambio != 0)
+            {
+                formaPagoDetalle.Add(new FormaPagoDetalle
+                {
+                    BatchId = batch.BatchId,
+                    FacturaId = facturaEncabezado.FacturaId,
+                    FormaPagoId = 098,
+                    Descripcion = "Cambio",
+                    Monto = facturaEncabezado.Cambio * -1,
+                    MontoExtranjero = facturaEncabezado.Cambio * -1,
+                    PagoId = string.Empty
+                });
+            }
+
+            return formaPagoDetalle;
         }
     }
 }

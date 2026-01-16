@@ -13,5 +13,6 @@ namespace Aplicacion.Services.ClienteServices
         ClienteDTO ActualizarCliente(ClienteRequest request);
 
         List<TipoCuentaDTO> ObtenerTipoCuentas(TipoCuentaRequest request);
+        ClienteDTO ObtenerClienteGenerico();
     }
 }

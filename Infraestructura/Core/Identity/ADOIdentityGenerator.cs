@@ -1,17 +1,24 @@
 ﻿using CrossCutting.Identity;
+using Infraestructura.Core;
 using Infraestructura.Core.Identity;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Runtime;
 
 namespace CrossCutting.Network.Identity
 {
     public class ADOIdentityGenerator : IIdentityGenerator
     {
-        private const string ConnectionString = "connectionString";
-        private readonly string _connectionExceptionMessage = string.Format("exception_ConnectionStringNotFound", ConnectionString);
-        private readonly string _connectionString = ConfigurationManager.ConnectionStrings[ConnectionString].ToString();
+        private const string ConnectionStringName = "conectionDataBase";
+        private readonly string _connectionExceptionMessage = string.Format("exception_ConnectionStringNotFound", ConnectionStringName);
+        private readonly string _connectionString = "Server=DESKTOP-5RCL6C7\\SQLEXPRESS; initial Catalog=SmartPos; Integrated Security=True; TrustServerCertificate=true";
+
+        public ADOIdentityGenerator()
+        {
+            
+        }
 
         #region Implementation of IIdentityGenerator
 

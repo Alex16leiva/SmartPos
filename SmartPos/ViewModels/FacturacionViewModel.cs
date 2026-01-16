@@ -15,6 +15,8 @@ using Aplicacion.Services.FPagos;
 using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Dominio.Context.Entidades.FacturaAgg;
+using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
@@ -30,8 +32,6 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private FacturaEncabezadoDTO _encabezado = new();
 
         [ObservableProperty] private BatchDTO _batchActual;
-        [ObservableProperty] private ObservableCollection<FormasPagoDTO> _formasPago = new();
-        [ObservableProperty]private ObservableCollection<FormasPagoDTO> _formasDePagoOriginal = new();
         [ObservableProperty] private bool _isBusy;
 
         [ObservableProperty] private ObservableCollection<VendedorDTO> _vendedores = new();
@@ -39,6 +39,8 @@ namespace SmartPos.ViewModels
 
         [ObservableProperty] private ConfiguracionTiendaDTO _configuracionTiendaSeleccionada = new();
 
+        [ObservableProperty] private ObservableCollection<FormasPagoDTO> _formasPago = new();
+        [ObservableProperty]private ObservableCollection<FormasPagoDTO> _formasDePagoOriginal = new();
         [ObservableProperty]private decimal _cambio;
         [ObservableProperty]private decimal _totalCobro;
         [ObservableProperty]public decimal _totalMostrar;
@@ -118,7 +120,7 @@ namespace SmartPos.ViewModels
                 {
                     ArticuloId = BusquedaArticulo.Trim(),
                     Vendedor = VendedorSeleccionado ?? new VendedorDTO(),
-                    FacturasDetalle = FacturaDetalle.ToList()
+                    FacturaDetalle = FacturaDetalle.ToList()
                 };
                 var response = facturaAppService.AgregarArticuloAFactura(request);
 
@@ -160,7 +162,7 @@ namespace SmartPos.ViewModels
                 var facturaAppService = scope.ServiceProvider.GetRequiredService<IFacturaApplicationService>();
                 FacturaRequest request = new FacturaRequest
                 {
-                    FacturasDetalle = FacturaDetalle.ToList()
+                    FacturaDetalle = FacturaDetalle.ToList()
                 };
 
                 var response = facturaAppService.CalcularFacturaDetalle(request);
@@ -251,6 +253,20 @@ namespace SmartPos.ViewModels
                 Encabezado.ClienteId = ClienteSeleccionado.NumeroCuenta;
                 // Si tienes una propiedad para mostrar el nombre en la UI:
                 NombreClienteActual = $"{ClienteSeleccionado.Nombre} {ClienteSeleccionado.Apellido}";
+            }
+        }
+
+        public void CargarClienteGenerico()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var clienteService = scope.ServiceProvider.GetRequiredService<IClienteApplicationService>();
+                var clienteGenerico = clienteService.ObtenerClienteGenerico();
+                if (clienteGenerico != null)
+                {
+                    ClienteSeleccionado = clienteGenerico;
+                    SeleccionarCliente();
+                }
             }
         }
 
@@ -374,16 +390,88 @@ namespace SmartPos.ViewModels
             IsBusy = false;
         }
 
+        [RelayCommand] // Asegúrate de tener el atributo para que el botón lo vea
         public void MostrarVentanaDePago()
         {
             if (EsUnCobroValido())
             {
+                // 1. Cálculos finales antes de cobrar
                 TotalMostrar = Math.Round(FacturaDetalle.Sum(r => r.Total), 2);
-                
+
                 ClienteTieneCredito = ClienteSeleccionado != null ? ClienteSeleccionado.TieneCredito : false;
+
+                // 2. Filtrar formas de pago según el cliente
                 ObtenerFormaPago(ClienteTieneCredito);
-                
-                //new CobrosView().ShowDialog();
+
+                // 3. Instanciar la vista de cobros
+                var vistaCobro = new CobrosView();
+
+                // 4. Compartir el DataContext (esto es lo que permite que funcione todo)
+                vistaCobro.DataContext = this;
+
+                // 5. Mostrar como diálogo modal
+                var resultado = vistaCobro.ShowDialog();
+            }
+        }
+
+        // Lógica para calcular el cambio cada vez que se escribe en el DataGrid
+        partial void OnTotalCobroChanged(decimal value)
+        {
+            Cambio = TotalCobro - TotalMostrar;
+        }
+
+        // Este método se debe llamar cuando el cajero termina de escribir en una celda
+        public void CalcularTotalRecibido()
+        {
+            TotalCobro = FormasPago.Sum(x => x.MostrarCobro);
+        }
+
+        [RelayCommand]
+        public async Task GuardarPago()
+        {
+            // 1. Validación: ¿El monto recibido es suficiente?
+            if (TotalCobro < TotalMostrar)
+            {
+                _commonService.ShowWarning("El monto recibido es menor al total de la venta.");
+                return;
+            }
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var facturaService = scope.ServiceProvider.GetRequiredService<IFacturaApplicationService>();
+
+                // Preparamos el objeto para enviar al backend
+                var nuevaFactura = new FacturaRequest
+                {
+                    FacturaEncabezado = new FacturaEncabezadoDTO
+                    {
+                        BatchId = BatchActual.BatchId,
+                        ClienteId = Encabezado.ClienteId,
+                        SubTotal = Encabezado.SubTotal,
+                        Impuesto = Encabezado.Impuesto,
+                        Descuento = Encabezado.Descuento,
+                        CampoPersonalizado1 = string.Empty, //CampoPersonalizado1,
+                        CampoPersonalizado2 = string.Empty, //CampoPersonalizado2,
+                        Comentario = string.Empty,
+                        LlamadaTipo = string.Empty,
+                        LLamadaId = string.Empty,
+                        Cambio = Cambio,
+                        Total = Encabezado.Total,
+                        CajaId = _commonService.GetRequestInfo().Caja,
+                    },
+                    FacturaDetalle = FacturaDetalle.ToList(),
+                    FormasPagos = FormasPago.ToList(),
+                    RequestUserInfo = _commonService.GetRequestInfo()
+                };
+
+                // Llamada al servicio
+                var result = await Task.Run(() => facturaService.CrearFactura(nuevaFactura));
+
+                if (result != null)
+                {
+                    _commonService.ShowSuccess("Venta realizada con éxito");
+                    // Aquí podrías disparar la limpieza de la pantalla
+                }
             }
         }
 
@@ -410,18 +498,18 @@ namespace SmartPos.ViewModels
 
         private void ObtenerFormaPago(bool esCobroCredito)
         {
-            FormasPago = new ObservableCollection<FormasPagoDTO>(FormasDePagoOriginal);
-            FormasPago.ToList().ForEach(r => r.Cobro = 0);
-            FormasPago.ToList().ForEach(r => r.MostrarCobro = 0);
+            // Limpiamos y recargamos desde la lista original
+            FormasPago.Clear();
 
-            if (!esCobroCredito)
+            foreach (var fp in FormasDePagoOriginal)
             {
-                //escredito
-                List<FormasPagoDTO> formasDePagoCredito = FormasPago.Where(r => r.TipoPago == 2).ToList();
-                foreach (var item in formasDePagoCredito)
-                {
-                    FormasPago.Remove(item);
-                }
+                // Si no tiene crédito, saltamos las formas de pago tipo 2 (Crédito)
+                if (!esCobroCredito && fp.TipoPago == 2) continue;
+
+                // Resetear valores de cobro para la nueva transacción
+                fp.Cobro = 0;
+                fp.MostrarCobro = 0;
+                FormasPago.Add(fp);
             }
         }
 
