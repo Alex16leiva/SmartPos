@@ -10,7 +10,7 @@ namespace CrossCutting.Network.Identity
 
         public ADOIdentityGeneratorFactory(IOptions<DataBaseSetting> options)
         {
-            _connectionString = options.Value.conectionDataBase;
+            _connectionString = options.Value.ConnectionString;
         }
 
         public IIdentityGenerator Create()

@@ -15,8 +15,6 @@ using Aplicacion.Services.FPagos;
 using Aplicacion.Services.VendedorSevices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Dominio.Context.Entidades.FacturaAgg;
-using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using SmartPos.Comunes.CommonServices;
@@ -76,6 +74,7 @@ namespace SmartPos.ViewModels
             ObtenerBatch();
             CargarFormasPago();
             ObtenerConfiguracionTiendas();
+            CargarClienteGenerico();
         }
 
         public void CargarVendedoresAsync()

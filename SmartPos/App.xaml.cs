@@ -15,6 +15,7 @@ using Infraestructura.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.Comunes.Extensions;
@@ -58,16 +59,17 @@ namespace SmartPos
             services.AddSingleton<IConfiguration>(configuration);
 
 
-            string connectionString = configuration.GetConnectionString("conectionDataBase");
+            string connectionString = configuration.GetConnectionString("ConnectionString");
             services.Configure<DataBaseSetting>(options =>
             {
                 configuration.GetSection("DataBaseSetting").Bind(options);
             });
 
             // 2. Base de Datos: Cambiamos a Scoped
-            services.AddDbContext<SmartPostDbContext>(options =>
+            services.AddDbContext<SmartPostDbContext>((sp, options) =>
             {
-                options.UseSqlServer(connectionString);
+                var dbSettings = sp.GetRequiredService<IOptions<DataBaseSetting>>().Value;
+                options.UseSqlServer(dbSettings.ConnectionString);
             }, ServiceLifetime.Scoped);
 
             // 3. Mapeo de Interfaz: Scoped

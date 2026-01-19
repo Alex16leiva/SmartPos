@@ -2,6 +2,7 @@
 {
     public class DataBaseSetting
     {
-        public string conectionDataBase { get; set; }
+        public string ConnectionString { get; set; }
+
     }
 }

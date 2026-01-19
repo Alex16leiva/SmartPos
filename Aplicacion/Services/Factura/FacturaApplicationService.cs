@@ -107,7 +107,7 @@ namespace Aplicacion.Services.Factura
                 Cantidad = r.Cantidad,
                 CantidadArticulos = r.CantidadArticulos,
                 CantidadOriginal = r.CantidadOriginal,
-                Comentario = string.IsNullOrWhiteSpace(r.Comentario) ? string.Empty : r.Comentario,
+                Comentario = r.Comentario.ValueOrEmpty(),
                 Comision = r.Comision,
                 Costo = r.Costo,
                 Descripcion = r.Descripcion,
@@ -169,7 +169,7 @@ namespace Aplicacion.Services.Factura
             }
 
             string correlativoFacturaId = IdentityFactory.CreateIdentity().NextCorrelativeIdentity("FA");
-            request.FacturaEncabezado.LLamadaId = string.IsNullOrWhiteSpace(request.FacturaEncabezado.FacturaId) ? string.Empty : request.FacturaEncabezado.FacturaId;
+            request.FacturaEncabezado.LLamadaId = request.FacturaEncabezado.FacturaId.ValueOrEmpty();
             request.FacturaEncabezado.FacturaId = correlativoFacturaId;
 
             if (request.FacturaEncabezado.EsDevolucion)
@@ -196,19 +196,12 @@ namespace Aplicacion.Services.Factura
                 }).ToList();
 
             _facturaServicioDominio.CrearFactura(batch, facturaEncabezado, facturaDetalle, formasPago, articulos.ToList(), cliente);
-                TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("CrearFactura");
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("CrearFactura");
 
-            try
-            {
-                _genericRepository.UnitOfWork.Commit(transactionInfo);
+            
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
 
-            }
-            catch (Exception e)
-            {
-
-                throw;
-            }
-
+    
             facturaEncabezado.FechaTransaccion = transactionInfo.FechaTransaccion;
             return new FacturaResponse
             {

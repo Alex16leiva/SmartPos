@@ -49,5 +49,10 @@ namespace Dominio.Core.Extensions
         {
             return dateTime == default(DateTime);
         }
+
+        public static DateTime GetDateOrDefault(this DateTime dateTime)
+        {
+            return dateTime.HasDefaultValue() ? DateTime.Now : dateTime;
+        }
     }
 }
