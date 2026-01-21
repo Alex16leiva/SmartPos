@@ -17,6 +17,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using SmartPos.Comunes;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using SmartPos.Views;
@@ -466,11 +467,24 @@ namespace SmartPos.ViewModels
                 // Llamada al servicio
                 var result = await Task.Run(() => facturaService.CrearFactura(nuevaFactura));
 
-                if (result != null)
+                if (result.HasAnyMessage())
                 {
-                    _commonService.ShowSuccess("Venta realizada con éxito");
-                    // Aquí podrías disparar la limpieza de la pantalla
+                    _commonService.ShowWarning(result.Getmessage());
+                    return;
                 }
+
+                
+                _commonService.ShowSuccess("Venta realizada con éxito");
+
+                Impresiones.ConfiguracionTienda = ConfiguracionTiendaSeleccionada;
+                Impresiones.FacturaEncabezado = result.FacturaEncabezado;
+                Impresiones.FacturaDetalle = result.FacturaDetalle;
+                Impresiones.ClienteSeleccionado = ClienteSeleccionado;
+                string errorImpresion = string.Empty;
+                bool esVisor = false;
+                Impresiones.ImprimirFacturaContado("", esVisor, out errorImpresion);
+
+                LimpiarPantalla();
             }
         }
 

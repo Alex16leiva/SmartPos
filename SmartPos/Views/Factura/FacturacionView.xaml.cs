@@ -11,7 +11,7 @@ namespace SmartPos.Views.Factura
     /// <summary>
     /// Interaction logic for FacturacionView.xaml
     /// </summary>
-    public partial class FacturacionView : UserControl
+    public partial class FacturacionView : System.Windows.Controls.UserControl
     {
         public FacturacionView()
         {
@@ -20,7 +20,7 @@ namespace SmartPos.Views.Factura
             Loaded += (s, e) => TxtBusqueda.Focus();
         }
 
-        private void TxtBusqueda_KeyDown(object sender, KeyEventArgs e)
+        private void TxtBusqueda_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

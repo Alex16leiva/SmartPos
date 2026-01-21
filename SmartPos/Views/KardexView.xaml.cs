@@ -49,7 +49,7 @@ namespace SmartPos.Views
         private async Task ExportarKardexAExcel(IEnumerable<InventarioMovimientoDTO> datos)
         {
             // 1. Configurar el diálogo de guardado
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new()
             {
                 Filter = "Excel Files (*.xlsx)|*.xlsx",
                 FileName = $"Kardex_{_articuloId}_{DateTime.Now:yyyyMMdd}"

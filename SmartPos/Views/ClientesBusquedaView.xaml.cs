@@ -17,7 +17,7 @@ namespace SmartPos.Views
 
 
 
-        private void DataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void DataGrid_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
@@ -36,7 +36,7 @@ namespace SmartPos.Views
             }
         }
 
-        private void dgClientes_KeyUp(object sender, KeyEventArgs e)
+        private void dgClientes_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

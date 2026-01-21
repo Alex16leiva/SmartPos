@@ -65,7 +65,7 @@ namespace SmartPos.ViewModels
 
                 mainWindow.Show();
 
-                var loginWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is SmartPos.Views.LoginView);
+                var loginWindow = System.Windows.Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is SmartPos.Views.LoginView);
                 loginWindow?.Close();
 
             }

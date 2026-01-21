@@ -9,14 +9,13 @@ namespace Aplicacion.DTOs
         public string? SuccessMessage { get; set; }
         public DateTime? FechaTransaccion { get; set; }
         public string? ModificadoPor { get; set; }
-        public bool HasValidationMessage()
-        {
-            return Message.HasValue();
-        }
+        public bool HasValidationMessage() => Message.HasValue();
 
-        public bool HasValidationErrorMessage()
+        public bool HasValidationErrorMessage() => ValidationErrorMessage.HasValue();
+
+        public bool HasAnyMessage()
         {
-            return !string.IsNullOrWhiteSpace(ValidationErrorMessage);
+            return HasValidationErrorMessage() || HasValidationMessage();
         }
 
         public void AppendValidationErrorMessage(string message)
@@ -27,6 +26,13 @@ namespace Aplicacion.DTOs
                 return;
             }
             ValidationErrorMessage = message;
+        }
+
+        public string Getmessage()
+        {
+            if (HasValidationErrorMessage()) return ValidationErrorMessage!;
+            if (HasValidationMessage()) return Message!;
+            return string.Empty;
         }
     }
 }

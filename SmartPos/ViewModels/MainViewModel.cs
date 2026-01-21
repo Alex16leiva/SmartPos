@@ -72,7 +72,7 @@ namespace SmartPos.ViewModels
 
             // 5. Buscamos todas las instancias de MainWindow y las cerramos
             // Hacemos un .ToList() para evitar errores de "colección modificada"
-            var ventanasACerrar = Application.Current.Windows
+            var ventanasACerrar = System.Windows.Application.Current.Windows
                 .OfType<SmartPos.Views.MainWindow>()
                 .ToList();
 

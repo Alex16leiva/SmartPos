@@ -9,7 +9,7 @@ namespace SmartPos.Views
     /// <summary>
     /// Interaction logic for InventarioView.xaml
     /// </summary>
-    public partial class InventarioView : UserControl
+    public partial class InventarioView : System.Windows.Controls.UserControl
     {
         public InventarioView()
         {
@@ -22,7 +22,7 @@ namespace SmartPos.Views
         {
             // 1. Obtenemos el artículo seleccionado del DataGrid
             // Asumiendo que el objeto de la fila es 'ArticuloDTO'
-            var boton = sender as Button;
+            var boton = sender as System.Windows.Controls.Button;
             var articuloSeleccionado = boton.DataContext as ArticulosDTO;
 
             if (articuloSeleccionado != null)

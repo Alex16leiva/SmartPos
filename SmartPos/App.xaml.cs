@@ -16,19 +16,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using OfficeOpenXml;
 using SmartPos.Comunes.CommonServices;
 using SmartPos.Comunes.Extensions;
 using SmartPos.ViewModels;
 using SmartPos.Views;
 using SmartPos.Views.Factura;
 using System.IO;
-using System.Runtime;
 using System.Windows;
 
 namespace SmartPos
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static IServiceProvider ServiceProvider { get; private set; }
 
