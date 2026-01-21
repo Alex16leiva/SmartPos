@@ -127,6 +127,8 @@ namespace SmartPos.ViewModels
                 new HamburgerMenuIconItem { Icon = "📦", Label = "Inventario", Tag = "Inventario" },
                 new HamburgerMenuIconItem { Icon = "🛒", Label = "Ventas", Tag = "Ventas" },
                 new HamburgerMenuIconItem { Icon = "🔒", Label = "Seguridad", Tag = "Seguridad" },
+                new HamburgerMenuIconItem { Icon = "👥", Label = "Clientes", Tag = "Clientes" },
+                new HamburgerMenuIconItem { Icon = "📊", Label = "Reportes", Tag = "Reportes" },
 
             };
 
@@ -138,11 +140,6 @@ namespace SmartPos.ViewModels
 
                 MenuItems.Add(nuevoMenu);
             }
-
-            // Por defecto, iniciamos en Inventario
-            // 1. Cargar vista por defecto
-            //SelectedMenuItem = (HamburgerMenuItem)MenuItems.FirstOrDefault();
-            //Navegar(SelectedMenuItem.Label);
 
             var info = _commonService.GetRequestInfo();
             if (info != null)
@@ -164,7 +161,9 @@ namespace SmartPos.ViewModels
                     break;
                 case "Ventas":
                      CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<FacturacionViewModel>(_serviceProvider);
-
+                    break;
+                case "Clientes":
+                    CurrentView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<ClienteViewModel>(_serviceProvider);
                     break;
             }
         }

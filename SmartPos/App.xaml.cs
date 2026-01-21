@@ -82,11 +82,14 @@ namespace SmartPos
             services.AddTransient<LoginViewModel>();
             services.AddTransient<SeguridadViewModel>();
             services.AddTransient<FacturacionViewModel>();
+            services.AddTransient<ClienteViewModel>();
 
             // 6. Vistas
             services.AddTransient<Views.MainWindow>();
             services.AddTransient<LoginView>();
             services.AddTransient<FacturacionView>();
+            services.AddTransient<InventarioView>();
+            services.AddTransient<ClienteView>();
 
 
             // 7. ApplicationServices

@@ -362,13 +362,13 @@ namespace SmartPos.ViewModels
         {
             IsBusy = true;
 
-            var request = new ClienteRequest // Asegúrate de que herede de BaseRequest o use QueryInfo
+            var request = new ClienteRequest 
             {
                 QueryInfo = new QueryInfo
                 {
                     PageIndex = PaginaActualClientes - 1,
                     PageSize = RegistrosPorPagina,
-                    SortFields = new List<string> { "Nombre" },
+                    SortFields = ["Nombre"],
                     Ascending = true,
                     Predicate = !string.IsNullOrWhiteSpace(TextoBusquedaModal)
                                 ? "ClienteId.ToString().Contains(@0) OR Nombre.Contains(@0) OR Identificacion.Contains(@0)"
@@ -390,7 +390,7 @@ namespace SmartPos.ViewModels
             IsBusy = false;
         }
 
-        [RelayCommand] // Asegúrate de tener el atributo para que el botón lo vea
+        [RelayCommand] 
         public void MostrarVentanaDePago()
         {
             if (EsUnCobroValido())
