@@ -1,5 +1,6 @@
 ﻿using Dominio.Context.Entidades.FacturaAgg;
 using Dominio.Core;
+using Dominio.Core.Extensions;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dominio.Context.Entidades.Finanzas
@@ -33,14 +34,10 @@ namespace Dominio.Context.Entidades.Finanzas
         public virtual ICollection<FacturaEncabezado> FacturaEncabezado { get; set; }
         public virtual ICollection<CuentasPorCobrarHistorial> CuentasPorCobrarHistorial { get; set; }
 
-        public void ActualizarEstadoNuevo()
-        {
-            Estado = "Nuevo";
-        }
-
         public void ActualizarEstadoCerrado()
         {
             Estado = "Cerrado";
+            FechaCierre = DateTime.Now;
         }
 
         internal void AgregarDiario(Diario diario)
@@ -71,6 +68,26 @@ namespace Dominio.Context.Entidades.Finanzas
             }
 
             CuentasPorCobrarHistorial.Add(cuentaPorCobrarHistorial);
+        }
+
+        public bool EstaCerrado()
+        {
+            return Estado == "Cerrado";
+        }
+
+        public void CrearDiario()
+        {
+            if (Diario.IsNull())
+            {
+                Diario = [];
+            }
+            Diario.Add(new Diario
+            {
+                BatchId = this.BatchId,
+                CajaId = this.CajaId,
+                Referencia = this.BatchId,
+                TipoTransaccionId = "ReporteZ",
+            });
         }
     }
 }

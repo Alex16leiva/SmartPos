@@ -87,5 +87,34 @@ namespace Aplicacion.Services.Finanzas
                 VentasCredito = entidad.VentasCredito,
             };
         }
+
+        public async Task<BatchDTO> RealizarCierreZ(BatchRequest request)
+        {
+            var batch = await _genericRepository.GetSingleAsync<Batch>(item => item.BatchId == request.Batch.BatchId);
+
+            if (batch.IsNull())
+            {
+                return new BatchDTO
+                {
+                    Message = "No se encontró el Batch."
+                };
+            }
+
+            if (batch.EstaCerrado())
+            {
+                return new BatchDTO
+                {
+                    Message = "El Batch ya está cerrado."
+                };
+            }
+
+            batch.ActualizarEstadoCerrado();
+            batch.CrearDiario();
+
+            return new BatchDTO
+            {
+                BatchImpresion = MapBatchEntidadADto(batch)
+            };
+        }
     }
 }

@@ -22,6 +22,7 @@ using SmartPos.Comunes.CommonServices;
 using SmartPos.DTOs.Articulos;
 using SmartPos.Views;
 using System.Collections.ObjectModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SmartPos.ViewModels
 {
@@ -446,6 +447,7 @@ namespace SmartPos.ViewModels
                     FacturaEncabezado = new FacturaEncabezadoDTO
                     {
                         BatchId = BatchActual.BatchId,
+                        TipoFactura = ClienteSeleccionado.TieneCredito ? "CREDITO" : "CONTADO",
                         ClienteId = Encabezado.ClienteId,
                         SubTotal = Encabezado.SubTotal,
                         Impuesto = Encabezado.Impuesto,
@@ -490,11 +492,6 @@ namespace SmartPos.ViewModels
 
         private bool EsUnCobroValido()
         {
-            //if (RecibirPagoAFacturaDeCredito)
-            //{
-            //    return true;
-            //}
-
             if (FacturaDetalle.IsEmpty())
             {
                 _commonService.ShowWarning("No hay articulos a facturar");
@@ -543,6 +540,37 @@ namespace SmartPos.ViewModels
 
                 // Guardamos el BatchId para usarlo en la facturación y el Diario
                 BatchActual = _batchActual;
+            }
+        }
+
+        [RelayCommand]
+        private async Task GenerarReporteZ()
+        {
+            var request = new BatchRequest
+            {
+                Batch = BatchActual,
+                RequestUserInfo = _commonService.GetRequestInfo()
+            };
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IFinanzasApplicationService>();
+                var result = await service.RealizarCierreZ(request);
+
+                if (result.HasAnyMessage())
+                {
+                    _commonService.ShowWarning(result.Getmessage());
+                    return;
+                }
+
+                BatchActual = new BatchDTO();
+
+                var esVisor = false;
+                string errorImpresion = string.Empty;
+                Impresiones.Batch = result.BatchImpresion;
+                Impresiones.ImprimirReporteZ(string.Empty, esVisor, out errorImpresion);
+                _commonService.ShowSuccess("Cierre realizado.");
+                
             }
         }
     }

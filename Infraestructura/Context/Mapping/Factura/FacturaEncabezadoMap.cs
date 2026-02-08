@@ -11,6 +11,7 @@ namespace Infraestructura.Context.Mapping.Factura
             builder.HasKey(r => r.FacturaId);
             builder.ToTable("FacturaEncabezado", "dbo");
             builder.Property(r => r.FacturaId).HasColumnName("FacturaId").IsRequired().IsUnicode(false).HasMaxLength(50);
+            builder.Property(r => r.TipoFactura).HasColumnName("TipoFactura").IsRequired().IsUnicode(false).HasMaxLength(50);
             builder.Property(r => r.BatchId).HasColumnName("BatchId").IsRequired().IsUnicode(false).HasMaxLength(25);
             builder.Property(r => r.CajaId).HasColumnName("CajaId").IsRequired();
             builder.Property(r => r.ClienteId).HasColumnName("ClienteId").IsRequired().IsUnicode(false).HasMaxLength(25);

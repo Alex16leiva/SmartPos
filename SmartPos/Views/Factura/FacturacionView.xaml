@@ -173,6 +173,7 @@
         <Button Content="Reporte Z" 
                 Style="{StaticResource MahApps.Styles.Button.Flat}"
                 Background="White"
+                Command="{Binding GenerarReporteZCommand}"
                 mah:ControlsHelper.ContentCharacterCasing="Normal"/>
     </Border>
 

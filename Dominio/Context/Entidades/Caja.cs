@@ -1,5 +1,6 @@
 ﻿using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core;
+using Dominio.Core.Extensions;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dominio.Context.Entidades
@@ -22,9 +23,9 @@ namespace Dominio.Context.Entidades
 
         public void AgregarBatch(Batch nuevoBatch)
         {
-            if (Batches == null)
+            if (Batches.IsNull())
             {
-                Batches = new List<Batch>();
+                Batches = [];
             }
 
             Batches.Add(nuevoBatch);
@@ -32,7 +33,7 @@ namespace Dominio.Context.Entidades
 
         public void ActualizarInfoBatch(string batchId)
         {
-            if (string.IsNullOrWhiteSpace(BatchInicial))
+            if (BatchInicial.IsMissingValue())
             {
                 BatchInicial = batchId;
             }

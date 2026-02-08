@@ -8,6 +8,7 @@ namespace Dominio.Context.Entidades.FacturaAgg
     public class FacturaEncabezado : Entity
     {
         public string FacturaId { get; set; }
+        public string TipoFactura { get; set; }
         public string BatchId { get; set; }
         public int CajaId { get; set; }
         public string ClienteId { get; set; }

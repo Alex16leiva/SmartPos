@@ -6,5 +6,6 @@ namespace Aplicacion.Services.Finanzas
     {
         Task<BatchDTO> CrearBatch(BatchRequest request);
         Task<BatchDTO> ObtenerBatch(BatchRequest request);
+        Task<BatchDTO> RealizarCierreZ(BatchRequest request);
     }
 }

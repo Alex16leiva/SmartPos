@@ -155,6 +155,14 @@ namespace Aplicacion.Services.Factura
         {
             Batch batch = await _genericRepository.GetSingleAsync<Batch>(r => r.BatchId == request.FacturaEncabezado.BatchId);
 
+            if (batch.EstaCerrado())
+            {
+                return new FacturaResponse
+                {
+                    Message = "No se puede crear la factura porque el batch está cerrado, genere un nuevo batch"
+                };
+            }
+
             RegimenFiscal regimenFiscal = await _genericRepository.GetSingleAsync<RegimenFiscal>(r => r.Activo);
 
             List<string> articulosFacturados = request.FacturaDetalle.Select(r => r.ArticuloId).ToList();

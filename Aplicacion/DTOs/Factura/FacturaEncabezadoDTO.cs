@@ -5,6 +5,7 @@ namespace Aplicacion.DTOs.Factura
     public class FacturaEncabezadoDTO : ResponseBase
     {
         public string FacturaId { get; set; }
+        public string TipoFactura { get; set; }
         public string BatchId { get; set; }
         public int CajaId { get; set; }
         public string ClienteId { get; set; }
