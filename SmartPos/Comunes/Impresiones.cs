@@ -3,6 +3,7 @@ using Aplicacion.DTOs.ConfiTienda;
 using Aplicacion.DTOs.Factura;
 using Aplicacion.DTOs.Finanzas;
 using Dominio.Core;
+using Dominio.Core.Extensions;
 using System.Drawing;
 
 namespace SmartPos.Comunes
@@ -32,7 +33,7 @@ namespace SmartPos.Comunes
             StringFormat centerFormat = new() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
             StringFormat rightFormat = new() { Alignment = StringAlignment.Far };
 
-            int offset = 0;
+            int offset = 10;
             int movVert = 10;
 
             // --- ENCABEZADO DE TIENDA ---
@@ -57,12 +58,12 @@ namespace SmartPos.Comunes
             string nombreCliente = "CONSUMIDOR FRINAL";
             string rtnCliente = "S/N";
 
-            if (!string.IsNullOrWhiteSpace(FacturaEncabezado.CampoPersonalizado1))
+            if (FacturaEncabezado.CampoPersonalizado1.HasValue())
             {
                 nombreCliente = FacturaEncabezado.CampoPersonalizado1;
                 rtnCliente = FacturaEncabezado.CampoPersonalizado2.GetValueOrEmpty();
             }
-            else if (ClienteSeleccionado != null)
+            else if (ClienteSeleccionado.IsNull())
             {
                 nombreCliente = $"{ClienteSeleccionado.Nombre} {ClienteSeleccionado.Apellido}".Trim();
                 rtnCliente = ClienteSeleccionado.TextoPersonalizado1.GetValueOrEmpty();

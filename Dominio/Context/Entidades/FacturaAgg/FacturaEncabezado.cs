@@ -52,9 +52,9 @@ namespace Dominio.Context.Entidades.FacturaAgg
         public bool EsDevolucion { get; set; }
         internal void AgregarFacturaDetalle(List<FacturaDetalle> facturaDetalle)
         {
-            if (FacturaDetalle == null)
+            if (FacturaDetalle.IsNull())
             {
-                FacturaDetalle = new List<FacturaDetalle>();
+                FacturaDetalle = [];
             }
 
             FacturaDetalle = facturaDetalle;
@@ -62,9 +62,9 @@ namespace Dominio.Context.Entidades.FacturaAgg
 
         public void AgregarFormaPagoDetalle(List<FormaPagoDetalle> formaPagoDetalle)
         {
-            if (FormaPagoDetalle == null)
+            if (FormaPagoDetalle.IsNull())
             {
-                FormaPagoDetalle = new List<FormaPagoDetalle>();
+                FormaPagoDetalle = [];
             }
 
             FormaPagoDetalle = formaPagoDetalle;
@@ -75,15 +75,15 @@ namespace Dominio.Context.Entidades.FacturaAgg
             if (FacturaDetalle.IsNotNull())
             {
                 FacturaDetalle.ToList().ForEach(item =>
-                    item.Descripcion = (item.Articulo == null) ? string.Empty : item.Articulo.Descripcion);
+                    item.Descripcion = (item.Articulo.IsNull()) ? string.Empty : item.Articulo.Descripcion);
             }
         }
 
         internal void AgregarCuentaPorCobrar(CuentasPorCobrar cuentaPorCobrar)
         {
-            if (CuentaPorCobrar == null)
+            if (CuentaPorCobrar.IsNull())
             {
-                CuentaPorCobrar = new List<CuentasPorCobrar>();
+                CuentaPorCobrar = [];
             }
 
             CuentaPorCobrar.Add(cuentaPorCobrar);
@@ -92,15 +92,15 @@ namespace Dominio.Context.Entidades.FacturaAgg
         public string ObtenerNombreCliente()
         {
             var nombreCliente = string.Empty;
-            if (!string.IsNullOrWhiteSpace(CampoPersonalizado1))
+            if (CampoPersonalizado1.HasValue())
             {
                 nombreCliente = CampoPersonalizado1;
             }
             else
             {
-                if (Cliente != null && !string.IsNullOrWhiteSpace(Cliente.Nombre))
+                if (Cliente.IsNotNull())
                 {
-                    nombreCliente = Cliente.Nombre;
+                    nombreCliente = Cliente.Nombre.ValueOrEmpty();
                 }
             }
 

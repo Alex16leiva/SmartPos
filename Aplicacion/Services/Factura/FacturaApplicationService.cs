@@ -204,9 +204,8 @@ namespace Aplicacion.Services.Factura
                 }).ToList();
 
             _facturaServicioDominio.CrearFactura(batch, facturaEncabezado, facturaDetalle, formasPago, articulos.ToList(), cliente);
-            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("CrearFactura");
-
             
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("CrearFactura");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
 
     

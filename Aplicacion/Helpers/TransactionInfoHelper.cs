@@ -21,6 +21,7 @@ namespace Aplicacion.Helpers
             {
                 ModificadoPor = userInfoDTO.UsuarioId,
                 TipoTransaccion = transaccionId,
+                FechaTransaccion = DateTime.Now,
             };
         }
 
@@ -30,7 +31,8 @@ namespace Aplicacion.Helpers
 
             return new TransactionInfo
             {
-                ModificadoPor = userInfoDTO.UsuarioId
+                ModificadoPor = userInfoDTO.UsuarioId,
+                FechaTransaccion = DateTime.Now,
             };
         }
 

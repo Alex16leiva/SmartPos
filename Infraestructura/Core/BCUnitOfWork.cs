@@ -366,7 +366,7 @@ namespace Infraestructura.Core
             return new Logging.Transaction
             {
                 TransactionId = transaccionId.TransactionId,
-                TransactionDate = transaccionId.TransactionDate,
+                TransactionDate = transactionInfo.FechaTransaccion,
                 TransactionOrigen = transactionInfo.TipoTransaccion,
                 TransactionType = transactionInfo.TipoTransaccion,
                 ModifiedBy = transactionInfo.ModificadoPor

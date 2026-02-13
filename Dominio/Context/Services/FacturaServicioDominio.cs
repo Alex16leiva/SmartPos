@@ -124,7 +124,8 @@ namespace Dominio.Context.Services
             return facturasDetalle;
         }
 
-        public void CrearFactura(Batch batch, FacturaEncabezado facturaEncabezado, List<FacturaDetalle> facturaDetalle, List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente)
+        public void CrearFactura(Batch batch, FacturaEncabezado facturaEncabezado, List<FacturaDetalle> facturaDetalle, 
+            List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente)
         {
             facturaEncabezado.AgregarFacturaDetalle(facturaDetalle);
 
@@ -174,6 +175,12 @@ namespace Dominio.Context.Services
                 batch.VentasCredito += totalCredito;
 
                 cliente.SaldoCuenta += totalCredito;
+
+                facturaEncabezado.TipoFactura = "Credito";
+            }
+            else
+            {
+                facturaEncabezado.TipoFactura = "Contado";
             }
         }
 
@@ -222,7 +229,9 @@ namespace Dominio.Context.Services
                 string existeArticulo = articulosProcesados.FirstOrDefault(r => r == item.ArticuloId);
                 if (!string.IsNullOrWhiteSpace(existeArticulo)) continue;
 
-                item.Cantidad -= facturaDetalle.Where(r => r.ArticuloId == item.ArticuloId).Sum(r => r.Cantidad);
+                var cantidadArticulosFacturados = facturaDetalle.Where(r => r.ArticuloId == item.ArticuloId).Sum(r => r.Cantidad);
+
+                item.RebajarCantidad(cantidadArticulosFacturados);
                 articulosProcesados.Add(item.ArticuloId);
             }
         }
