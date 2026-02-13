@@ -2,6 +2,7 @@
 using Dominio.Context.Entidades.Articulos;
 using Dominio.Context.Entidades.FacturaAgg;
 using Dominio.Context.Entidades.Finanzas;
+using Dominio.Core.Extensions;
 
 namespace Dominio.Context.Services
 {
@@ -157,11 +158,11 @@ namespace Dominio.Context.Services
 
             batch.AgregarDiario(diario);
 
-            ActulizarArticulos(facturaDetalle, articulos);
+            SincronizarStockFacturado(facturaDetalle, articulos);
             facturaEncabezado.FechaCreacion = DateTime.Now;
             batch.AgregarFacturaEncabezado(facturaEncabezado);
 
-            if (cliente != null)
+            if (cliente.IsNotNull())
             {
                 cliente.ActualizacionFacturacion(facturaEncabezado.Total, facturaEncabezado.Descuento);
             }
@@ -221,9 +222,9 @@ namespace Dominio.Context.Services
             return formaPagoCredito.Any();
         }
 
-        private void ActulizarArticulos(List<FacturaDetalle> facturaDetalle, List<Articulo> articulos)
+        private void SincronizarStockFacturado(List<FacturaDetalle> facturaDetalle, List<Articulo> articulos)
         {
-            List<string> articulosProcesados = new List<string>();
+            List<string> articulosProcesados = [];
             foreach (var item in articulos)
             {
                 string existeArticulo = articulosProcesados.FirstOrDefault(r => r == item.ArticuloId);

@@ -1,6 +1,7 @@
 ﻿using Dominio.Context.Entidades.FacturaAgg;
 using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core;
+using Dominio.Core.Extensions;
 
 namespace Dominio.Context.Entidades
 {
@@ -64,7 +65,7 @@ namespace Dominio.Context.Entidades
 
         public bool TieneCredito()
         {
-            return TipoCuenta != null ? TipoCuenta.EsCredito : false;
+            return TipoCuenta.IsNotNull() && TipoCuenta.EsCredito;
         }
     }
 }
