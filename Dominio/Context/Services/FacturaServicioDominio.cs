@@ -16,7 +16,7 @@ namespace Dominio.Context.Services
 
             decimal cantidadArticulos = 1;
 
-            if (articulosAgregadorEnFactura.Any())
+            if (articulosAgregadorEnFactura.HasItems())
             {
                 cantidadArticulos += articulosAgregadorEnFactura.Sum(r => r.Cantidad);
             }
@@ -40,7 +40,7 @@ namespace Dominio.Context.Services
             decimal precioSinImpuesto = articulo.ObtenerPrecioSinImpuesto(precio);
             decimal impuestoArticulo = Math.Abs(precioSinImpuesto - precio);
 
-            FacturaDetalle nuevoFacturaDetalle = new FacturaDetalle
+            FacturaDetalle nuevoFacturaDetalle = new()
             {
                 ArticuloId = articulo.ArticuloId,
                 DescripcionExtendida = articulo.DescripcionExtendida,
@@ -105,7 +105,7 @@ namespace Dominio.Context.Services
                     }
                 }
 
-                if (vendedor == null)
+                if (vendedor.IsNull())
                 {
                     item.VendedorId = 0;
                     item.NombreVendedor = string.Empty;
@@ -219,7 +219,7 @@ namespace Dominio.Context.Services
         {
             var formaPagoCredito = formasDePago.Where(r => r.TipoPago == 4 && r.Cobro > 0);
 
-            return formaPagoCredito.Any();
+            return formaPagoCredito.HasItems();
         }
 
         private void SincronizarStockFacturado(List<FacturaDetalle> facturaDetalle, List<Articulo> articulos)
@@ -250,7 +250,7 @@ namespace Dominio.Context.Services
 
         private List<FormaPagoDetalle> MaterializarFormaPagoDetalle(List<FormasPago> formasPagos, Batch batch, FacturaEncabezado facturaEncabezado)
         {
-            List<FormaPagoDetalle> formaPagoDetalle = new List<FormaPagoDetalle>();
+            List<FormaPagoDetalle> formaPagoDetalle = [];
 
             List<FormasPago> formasPagoRecibeCobro = formasPagos.Where(r => r.Cobro > 0).ToList();
 

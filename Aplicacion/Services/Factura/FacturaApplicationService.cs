@@ -30,7 +30,7 @@ namespace Aplicacion.Services.Factura
 
             var articulosEntidad = _genericRepository.GetFiltered<Articulo>(r => articulos.Contains(r.ArticuloId));
 
-            if (articulosEntidad.IsNull() || !articulosEntidad.Where(r => r.ArticuloId.ToUpper() == request.ArticuloId.ToUpper()).Any())
+            if (articulosEntidad.IsNull() || !articulosEntidad.Where(r => r.ArticuloId.ToUpper() == request.ArticuloId.ToUpper()).HasItems())
             {
                 return new FacturaResponse
                 {
@@ -44,7 +44,7 @@ namespace Aplicacion.Services.Factura
             Vendedor vendedor = new Vendedor
             {
                 VendedorId = request.Vendedor.VendedorId,
-                Nombre = request?.Vendedor?.Nombre
+                Nombre = request?.Vendedor.Nombre.ValueOrEmpty()
             };
 
             List<FacturaDetalle> facturasDetalleEntidad = MapFacturaDetalleDeDtoAEntidad(request.FacturaDetalle, articulosEntidad);
@@ -286,7 +286,7 @@ namespace Aplicacion.Services.Factura
                 Cantidad = r.Cantidad,
                 CantidadArticulos = r.CantidadArticulos,
                 CantidadOriginal = r.CantidadOriginal,
-                Comentario = string.IsNullOrWhiteSpace(r.Comentario) ? string.Empty : r.Comentario,
+                Comentario = r.Comentario.ValueOrEmpty(),
                 Comision = r.Comision,
                 Costo = r.Costo,
                 Descripcion = r.Descripcion,
@@ -330,8 +330,8 @@ namespace Aplicacion.Services.Factura
                 LlamadaTipo = facturaEncabezado.LlamadaTipo,
                 CAI = regimenFiscal.IsNotNull() ? regimenFiscal.CAI : string.Empty,
                 Correlativo = regimenFiscal.IsNotNull() ? regimenFiscal.ObtenerCorrelativoNuevo() : string.Empty,
-                Desde = regimenFiscal.IsNotNull() ? regimenFiscal.Desde : string.Empty,
-                Hasta = regimenFiscal.IsNotNull() ? regimenFiscal.Hasta : string.Empty,
+                Desde = regimenFiscal.IsNotNull() ? regimenFiscal.Desde.ValueOrEmpty() : string.Empty,
+                Hasta = regimenFiscal.IsNotNull() ? regimenFiscal.Hasta.ValueOrEmpty() :string.Empty,
                 FechaLimiteEmision = regimenFiscal.IsNotNull() ? regimenFiscal.FechaLimiteEmision : DateTime.Now,
                 FechaCreacion = facturaEncabezado.FechaCreacion,
                 EsDevolucion = facturaEncabezado.EsDevolucion

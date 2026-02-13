@@ -399,7 +399,7 @@ namespace SmartPos.ViewModels
                 // 1. Cálculos finales antes de cobrar
                 TotalMostrar = Math.Round(FacturaDetalle.Sum(r => r.Total), 2);
 
-                ClienteTieneCredito = ClienteSeleccionado != null ? ClienteSeleccionado.TieneCredito : false;
+                ClienteTieneCredito = ClienteSeleccionado.IsNotNull() ? ClienteSeleccionado.TieneCredito : false;
 
                 // 2. Filtrar formas de pago según el cliente
                 ObtenerFormaPago(ClienteTieneCredito);

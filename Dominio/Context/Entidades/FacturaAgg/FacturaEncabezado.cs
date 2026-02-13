@@ -24,6 +24,9 @@ namespace Dominio.Context.Entidades.FacturaAgg
         public string CAI { get; set; }
         public string Correlativo { get; set; }
         public DateTime FechaCreacion { get; set; }
+        public decimal Saldo { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+        public string EstadoFactura { get; set; }
         public virtual ICollection<FacturaDetalle> FacturaDetalle { get; set; }
         public virtual ICollection<FormaPagoDetalle> FormaPagoDetalle { get; set; }
         public virtual ICollection<CuentasPorCobrar> CuentaPorCobrar { get; set; }
