@@ -28,6 +28,7 @@ namespace Infraestructura.Context.Mapping
             builder.Property(r => r.CorreoElectronico).HasColumnName("CorreoElectronico").HasMaxLength(255);
             builder.Property(r => r.TipoCuentaID).HasColumnName("TipoCuentaID");
             builder.Property(r => r.AperturaCuenta).HasColumnName("AperturaCuenta");
+            builder.Property(r => r.DiasLimitePagoFactura).HasColumnName("DiasLimitePagoFactura");
             builder.Property(r => r.LimiteCredito).HasColumnName("LimiteCredito").HasPrecision(18, 2);
             builder.Property(r => r.SaldoCuenta).HasColumnName("SaldoCuenta").HasPrecision(18, 2);
             builder.Property(r => r.Empleado).HasColumnName("Empleado");

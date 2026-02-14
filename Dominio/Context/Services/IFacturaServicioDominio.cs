@@ -15,6 +15,8 @@ namespace Dominio.Context.Services
 
         List<FacturaDetalle> CalcularTotales(List<FacturaDetalle> facturasDetalle);
         void CrearFactura(Batch batch, FacturaEncabezado facturaEncabezado, 
-            List<FacturaDetalle> facturaDetalle, List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente);
+            List<FacturaDetalle> facturaDetalle, List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente, RegimenFiscal regimenFiscal);
+
+        bool ValidarFactura(List<FormasPago> formasPago, Cliente cliente, out string mensajeValidacion);
     }
 }

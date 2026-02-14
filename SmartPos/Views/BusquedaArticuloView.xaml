@@ -44,14 +44,14 @@
 
         <Grid Grid.Row="2" Margin="0,15,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Command="{Binding AnteriorPaginaCommand}" Content="◀" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
+                <Button Command="{Binding PaginaAnteriorClientesCommand}" Content="◀" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
                 <TextBlock VerticalAlignment="Center" Margin="10,0">
                     <Run Text="Página "/>
                     <Run Text="{Binding PaginaActual}" FontWeight="Bold"/>
                     <Run Text=" de "/>
                     <Run Text="{Binding TotalPaginas}"/>
                 </TextBlock>
-                <Button Command="{Binding SiguientePaginaCommand}" Content="▶" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
+                <Button Command="{Binding PaginaSiguienteClientesCommand}" Content="▶" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

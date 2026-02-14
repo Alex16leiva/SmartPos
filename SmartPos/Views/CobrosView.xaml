@@ -43,7 +43,7 @@
                 <DataGridTextColumn Header="FORMA PAGO" Binding="{Binding Descripcion}" 
                                     Width="*" IsReadOnly="True" />
                 <DataGridTextColumn Header="CANTIDAD" 
-                                    Binding="{Binding MostrarCobro, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
+                                    Binding="{Binding Cobro, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
                                     Width="150">
                     
                     <DataGridTextColumn.ElementStyle>

@@ -13,7 +13,7 @@ namespace Dominio.Core.Extensions
             decimal decimalValue = 0;
             if (decimalStringValue.HasValue())
             {
-                Decimal.TryParse(decimalStringValue, out decimalValue);
+                _ = decimal.TryParse(decimalStringValue, out decimalValue);
             }
             return decimalValue;
         }
@@ -23,7 +23,7 @@ namespace Dominio.Core.Extensions
             int decimalValue = 0;
             if (decimalStringValue.HasValue())
             {
-                Int32.TryParse(decimalStringValue, out decimalValue);
+                _ = int.TryParse(decimalStringValue, out decimalValue);
             }
             return decimalValue;
         }
@@ -133,7 +133,7 @@ namespace Dominio.Core.Extensions
                 return false;
             }
 
-            List<char> charsToexclude = new List<char> { ',', '.' };
+            List<char> charsToexclude = [',', '.'];
             if (str.HasValue())
             {
                 var arr = str.ToArray();
@@ -147,7 +147,7 @@ namespace Dominio.Core.Extensions
 
         public static string GetBatchNoFromProcessSheetId(this string processSheetId)
         {
-            if (processSheetId.Contains("-"))
+            if (processSheetId.Contains('-'))
             {
                 return processSheetId.Substring(0, processSheetId.Length - 2);
             }
@@ -180,7 +180,7 @@ namespace Dominio.Core.Extensions
             }
 
             var width = skuFragment[3];
-            if (width.Contains("-"))
+            if (width.Contains('-'))
             {
                 return Convert.ToDecimal(width.Replace("-", "."));
             }
@@ -202,6 +202,14 @@ namespace Dominio.Core.Extensions
         public static string AddStringParameters(this string str, object[] parameters)
         {
             return string.Format(str, parameters);
+        }
+
+        public static string ToUpperTrim(this string value)
+        {
+            if (!value.HasValue())
+                return string.Empty;
+
+            return value.Trim().ToUpperInvariant();
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ namespace SmartPos
             services.AddScoped<IClienteApplicationService, ClienteApplicationService>();
 
             // 8. REGISTRO AUTOMÁTICO DE SERVICIOS (Llamando al nuevo método)
-            services.AddApplicationServicesWithInterceptors();
+            //services.AddApplicationServicesWithInterceptors();
 
 
             // 9. Configuración del Generador de Identidades (Correlativos)
@@ -128,39 +128,39 @@ namespace SmartPos
             e.Handled = true;
 
             // BUSCAMOS EL SELLO EN TODA LA CADENA (Recursivo)
-            bool yaFueRegistrado = false;
-            Exception exCheck = e.Exception;
+            //bool yaFueRegistrado = false;
+            //Exception exCheck = e.Exception;
 
-            while (exCheck != null)
-            {
-                if (exCheck.Data.Contains("Logged"))
-                {
-                    yaFueRegistrado = true;
-                    break;
-                }
-                exCheck = exCheck.InnerException;
-            }
+            //while (exCheck != null)
+            //{
+            //    if (exCheck.Data.Contains("Logged"))
+            //    {
+            //        yaFueRegistrado = true;
+            //        break;
+            //    }
+            //    exCheck = exCheck.InnerException;
+            //}
 
-            if (!yaFueRegistrado)
-            {
-                // Si no tiene el sello, es un error de UI puro (no pasó por servicios)
-                var logService = App.ServiceProvider.GetRequiredService<ILogService>();
-                var exParaLog = e.Exception.GetBaseException();
+            //if (!yaFueRegistrado)
+            //{
+            //    // Si no tiene el sello, es un error de UI puro (no pasó por servicios)
+            //    var logService = App.ServiceProvider.GetRequiredService<ILogService>();
+            //    var exParaLog = e.Exception.GetBaseException();
 
-                Task.Run(async () => {
-                    await logService.LogErrorAsync("WPF_UI", "Global", exParaLog, "System");
-                });
-            }
+            //    Task.Run(async () => {
+            //        await logService.LogErrorAsync("WPF_UI", "Global", exParaLog, "System");
+            //    });
+            //}
 
-            // Mostrar siempre la notificación con tu servicio común
-            var commonService = App.ServiceProvider.GetRequiredService<ICommonService>();
+            //// Mostrar siempre la notificación con tu servicio común
+            //var commonService = App.ServiceProvider.GetRequiredService<ICommonService>();
 
-            string mensajeAmigable = "### ¡Ups! Algo no salió como esperábamos\n\n" +
-                             "El sistema ha experimentado un inconveniente técnico. " +
-                             "No te preocupes, el detalle ha sido enviado automáticamente al equipo de soporte.\n\n" +
-                             "**Acción:** Por favor, intenta realizar la operación nuevamente o contacta al administrador.";
+            //string mensajeAmigable = "### ¡Ups! Algo no salió como esperábamos\n\n" +
+            //                 "El sistema ha experimentado un inconveniente técnico. " +
+            //                 "No te preocupes, el detalle ha sido enviado automáticamente al equipo de soporte.\n\n" +
+            //                 "**Acción:** Por favor, intenta realizar la operación nuevamente o contacta al administrador.";
 
-            commonService.ShowError(mensajeAmigable);
+            //commonService.ShowError(mensajeAmigable);
         }
 
     }

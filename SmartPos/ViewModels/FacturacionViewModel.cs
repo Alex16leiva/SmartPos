@@ -332,6 +332,39 @@ namespace SmartPos.ViewModels
             await LoadDataClientesAsync();
         }
 
+        async partial void OnClienteBusquedaChanged(string value)
+        {
+            _searchCts?.Cancel();
+            _searchCts = new CancellationTokenSource();
+            try
+            {
+                await Task.Delay(400, _searchCts.Token); // Espera 400ms tras dejar de escribir
+                PaginaActualClientes = 1;
+                await LoadDataClientesAsync();
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        [RelayCommand]
+        private async Task PaginaAnteriorClientes()
+        {
+            if (PaginaActualClientes > 1)
+            {
+                PaginaActualClientes--;
+                await LoadDataClientesAsync();
+            }
+        }
+
+        [RelayCommand]
+        private async Task PaginaSiguienteClientes()
+        {
+            if (PaginaActualClientes < TotalPaginasClientes)
+            {
+                PaginaActualClientes++;
+                await LoadDataClientesAsync();
+            }
+        }
+
         [RelayCommand]
         public async Task AbrirBusquedaClientes()
         {
@@ -369,14 +402,14 @@ namespace SmartPos.ViewModels
                 {
                     PageIndex = PaginaActualClientes - 1,
                     PageSize = RegistrosPorPagina,
-                    SortFields = ["Nombre"],
+                    SortFields = ["Id"],
                     Ascending = true,
-                    Predicate = !string.IsNullOrWhiteSpace(TextoBusquedaModal)
-                                ? "ClienteId.ToString().Contains(@0) OR Nombre.Contains(@0) OR Identificacion.Contains(@0)"
+                    Predicate = ClienteBusqueda.HasValue()
+                                ? "Id.ToString().Contains(@0) OR Nombre.Contains(@0) OR NumeroCuenta.Contains(@0)"
                                 : string.Empty,
-                    ParamValues = !string.IsNullOrWhiteSpace(TextoBusquedaModal)
-                                  ? new object[] { TextoBusquedaModal }
-                                  : Array.Empty<object>()
+                    ParamValues = !string.IsNullOrWhiteSpace(ClienteBusqueda)
+                                  ? [ClienteBusqueda]
+                                  : []
                 }
             };
 
@@ -399,16 +432,17 @@ namespace SmartPos.ViewModels
                 // 1. Cálculos finales antes de cobrar
                 TotalMostrar = Math.Round(FacturaDetalle.Sum(r => r.Total), 2);
 
-                ClienteTieneCredito = ClienteSeleccionado.IsNotNull() ? ClienteSeleccionado.TieneCredito : false;
+                ClienteTieneCredito = ClienteSeleccionado.IsNotNull() && ClienteSeleccionado.TieneCredito;
 
                 // 2. Filtrar formas de pago según el cliente
                 ObtenerFormaPago(ClienteTieneCredito);
 
                 // 3. Instanciar la vista de cobros
-                var vistaCobro = new CobrosView();
-
-                // 4. Compartir el DataContext (esto es lo que permite que funcione todo)
-                vistaCobro.DataContext = this;
+                var vistaCobro = new CobrosView
+                {
+                    // 4. Compartir el DataContext (esto es lo que permite que funcione todo)
+                    DataContext = this
+                };
 
                 // 5. Mostrar como diálogo modal
                 var resultado = vistaCobro.ShowDialog();
@@ -424,7 +458,7 @@ namespace SmartPos.ViewModels
         // Este método se debe llamar cuando el cajero termina de escribir en una celda
         public void CalcularTotalRecibido()
         {
-            TotalCobro = FormasPago.Sum(x => x.MostrarCobro);
+            TotalCobro = FormasPago.Sum(x => x.Cobro);
         }
 
         [RelayCommand]
@@ -513,8 +547,8 @@ namespace SmartPos.ViewModels
 
             foreach (var fp in FormasDePagoOriginal)
             {
-                // Si no tiene crédito, saltamos las formas de pago tipo 2 (Crédito)
-                if (!esCobroCredito && fp.TipoPago == 2) continue;
+                // Si no tiene crédito, saltamos las formas de pago tipo 4 (Crédito)
+                if (!esCobroCredito && fp.TipoPago == 4) continue;
 
                 // Resetear valores de cobro para la nueva transacción
                 fp.Cobro = 0;

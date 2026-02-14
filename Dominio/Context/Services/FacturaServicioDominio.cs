@@ -89,7 +89,7 @@ namespace Dominio.Context.Services
         public List<FacturaDetalle> CalcularFacturasDetalle(List<FacturaDetalle> facturasDetalleEntidad, 
             IEnumerable<Articulo> articulosEntidad, IEnumerable<Vendedor> vendedoresEntidad)
         {
-            List<FacturaDetalle> facturasDetalle = new List<FacturaDetalle>();
+            List<FacturaDetalle> facturasDetalle = [];
             foreach (var item in facturasDetalleEntidad)
             {
                 Articulo articulo = articulosEntidad.FirstOrDefault(r => r.ArticuloId == item.ArticuloId);
@@ -126,7 +126,7 @@ namespace Dominio.Context.Services
         }
 
         public void CrearFactura(Batch batch, FacturaEncabezado facturaEncabezado, List<FacturaDetalle> facturaDetalle, 
-            List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente)
+            List<FormasPago> formasPago, List<Articulo> articulos, Cliente cliente, RegimenFiscal regimenFiscal)
         {
             facturaEncabezado.AgregarFacturaDetalle(facturaDetalle);
 
@@ -171,23 +171,54 @@ namespace Dominio.Context.Services
             {
                 var totalCredito = formasPago.Where(r => r.TipoPago == 4).Sum(r => r.Cobro);
 
-                MaterializarCuentasPorCobrar(facturaEncabezado, totalCredito, batch, 0);
+                MaterializarCuentasPorCobrar(facturaEncabezado, totalCredito, batch, cliente.DiasLimitePagoFactura);
 
                 batch.VentasCredito += totalCredito;
 
+                if (!cliente.EstaDentroDelLimiteDeCredito(totalCredito)) {
+                    return;
+                }
                 cliente.SaldoCuenta += totalCredito;
-
                 facturaEncabezado.TipoFactura = "Credito";
+                facturaEncabezado.EstadoFactura = "Pendiente";
             }
             else
             {
                 facturaEncabezado.TipoFactura = "Contado";
+                facturaEncabezado.EstadoFactura = "Pagada";
+                facturaEncabezado.FechaVencimiento = facturaEncabezado.FechaCreacion;
             }
+
+            facturaEncabezado.AgregarInformacionRegimenFiscal(regimenFiscal);
+        }
+
+        public bool ValidarFactura(List<FormasPago> formasPago, Cliente cliente, out string mensajeValidacion)
+        {
+            if (FacturaTieneCredito(formasPago))
+            {
+                var totalCredito = formasPago.Where(r => r.TipoPago == 4).Sum(r => r.Cobro);
+
+                if (!cliente.TieneCredito())
+                {
+                    mensajeValidacion = $"El cliente {cliente.NumeroCuenta} no tiene credito";
+                    return true;
+                }
+
+                if (!cliente.EstaDentroDelLimiteDeCredito(totalCredito))
+                {
+                    mensajeValidacion = $"El cliente {cliente.NumeroCuenta} sobre paso su limite de credito";
+                    return true;
+                }
+            }
+
+            mensajeValidacion = string.Empty;
+            return false;
         }
 
         private void MaterializarCuentasPorCobrar(FacturaEncabezado facturaEncabezado, decimal totalCredito, Batch batch, int diasVencimiento)
         {
             var fechaTransaccion = DateTime.Now;
+            facturaEncabezado.FechaVencimiento = fechaTransaccion.AddDays(diasVencimiento);
             var nuevoCuentaPorCobrar = new CuentasPorCobrar
             {
                 Balance = totalCredito,

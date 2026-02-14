@@ -41,7 +41,7 @@ namespace Aplicacion.Services.Factura
 
             string mensajeValidacion = string.Empty;
 
-            Vendedor vendedor = new Vendedor
+            Vendedor vendedor = new()
             {
                 VendedorId = request.Vendedor.VendedorId,
                 Nombre = request?.Vendedor.Nombre.ValueOrEmpty()
@@ -49,7 +49,7 @@ namespace Aplicacion.Services.Factura
 
             List<FacturaDetalle> facturasDetalleEntidad = MapFacturaDetalleDeDtoAEntidad(request.FacturaDetalle, articulosEntidad);
 
-            Articulo articulo = articulosEntidad.FirstOrDefault(r => r.ArticuloId.ToUpper() == request.ArticuloId.ToUpper());
+            Articulo articulo = articulosEntidad.FirstOrDefault(r => r.ArticuloId.ToUpperTrim() == request.ArticuloId.ToUpperTrim());
 
             List<FacturaDetalle> facturasDetalle = _facturaServicioDominio.ObtenerFacturaDetalle(articulo, facturasDetalleEntidad, vendedor, out mensajeValidacion);
 
@@ -169,28 +169,13 @@ namespace Aplicacion.Services.Factura
 
             IEnumerable<Articulo> articulos = await _genericRepository.GetFilteredAsync<Articulo>(r => articulosFacturados.Contains(r.ArticuloId));
 
-            Cliente cliente = new Cliente();
+            Cliente cliente = new();
 
             if (request.FacturaEncabezado.ClienteId.HasValue())
             {
-                cliente = await _genericRepository.GetSingleAsync<Cliente>(item =>  item.NumeroCuenta == request.FacturaEncabezado.ClienteId );
+                List<string> includes = ["TipoCuenta"];
+                cliente = await _genericRepository.GetSingleAsync<Cliente>(item =>  item.NumeroCuenta == request.FacturaEncabezado.ClienteId, includes );
             }
-
-            string correlativoFacturaId = IdentityFactory.CreateIdentity().NextCorrelativeIdentity("FA");
-            request.FacturaEncabezado.LLamadaId = request.FacturaEncabezado.FacturaId.ValueOrEmpty();
-            request.FacturaEncabezado.FacturaId = correlativoFacturaId;
-
-            if (request.FacturaEncabezado.EsDevolucion)
-            {
-                var facturaOriginal = await _genericRepository.GetSingleAsync<FacturaEncabezado>(r => r.FacturaId == request.FacturaEncabezado.LLamadaId);
-
-                facturaOriginal.LLamadaId = correlativoFacturaId;
-                facturaOriginal.LlamadaTipo = "ReferenciaDevolucion";
-            }
-
-            FacturaEncabezado facturaEncabezado = MaterializarFacturaEncabezadoDtoAEntidad(request.FacturaEncabezado, regimenFiscal);
-
-            List<FacturaDetalle> facturaDetalle = MaterializarFacturaDetalleDtoAEntidad(request.FacturaDetalle, articulos);
 
             List<FormasPago> formasPago = request.FormasPagos.Select(r =>
                 new FormasPago
@@ -203,7 +188,31 @@ namespace Aplicacion.Services.Factura
                     TipoPago = r.TipoPago
                 }).ToList();
 
-            _facturaServicioDominio.CrearFactura(batch, facturaEncabezado, facturaDetalle, formasPago, articulos.ToList(), cliente);
+            var mensajeValidacion = string.Empty;
+            if (_facturaServicioDominio.ValidarFactura(formasPago, cliente, out mensajeValidacion))
+            {
+                return new FacturaResponse
+                {
+                    Message = mensajeValidacion,
+                };
+            }
+
+            var correlativoFactura = IdentityFactory.CreateIdentity().NextCorrelativeIdentity("FA");
+            request.FacturaEncabezado.LLamadaId = request.FacturaEncabezado.FacturaId.ValueOrEmpty();
+            request.FacturaEncabezado.FacturaId = correlativoFactura;
+            if (request.FacturaEncabezado.EsDevolucion)
+            {
+                var facturaOriginal = await _genericRepository.GetSingleAsync<FacturaEncabezado>(r => r.FacturaId == request.FacturaEncabezado.LLamadaId);
+
+                facturaOriginal.LLamadaId = correlativoFactura;
+                facturaOriginal.LlamadaTipo = "ReferenciaDevolucion";
+            }
+
+            FacturaEncabezado facturaEncabezado = MaterializarFacturaEncabezadoDtoAEntidad(request.FacturaEncabezado);
+
+            List<FacturaDetalle> facturaDetalle = MaterializarFacturaDetalleDtoAEntidad(request.FacturaDetalle, articulos);
+
+            _facturaServicioDominio.CrearFactura(batch, facturaEncabezado, facturaDetalle, formasPago, articulos.ToList(), cliente, regimenFiscal);
             
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("CrearFactura");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
@@ -310,7 +319,7 @@ namespace Aplicacion.Services.Factura
             }).ToList();
         }
 
-        private FacturaEncabezado MaterializarFacturaEncabezadoDtoAEntidad(FacturaEncabezadoDTO facturaEncabezado, RegimenFiscal regimenFiscal)
+        private FacturaEncabezado MaterializarFacturaEncabezadoDtoAEntidad(FacturaEncabezadoDTO facturaEncabezado)
         {
             return new FacturaEncabezado
             {
@@ -328,11 +337,6 @@ namespace Aplicacion.Services.Factura
                 Descuento = facturaEncabezado.Descuento,
                 LLamadaId = facturaEncabezado.LLamadaId,
                 LlamadaTipo = facturaEncabezado.LlamadaTipo,
-                CAI = regimenFiscal.IsNotNull() ? regimenFiscal.CAI : string.Empty,
-                Correlativo = regimenFiscal.IsNotNull() ? regimenFiscal.ObtenerCorrelativoNuevo() : string.Empty,
-                Desde = regimenFiscal.IsNotNull() ? regimenFiscal.Desde.ValueOrEmpty() : string.Empty,
-                Hasta = regimenFiscal.IsNotNull() ? regimenFiscal.Hasta.ValueOrEmpty() :string.Empty,
-                FechaLimiteEmision = regimenFiscal.IsNotNull() ? regimenFiscal.FechaLimiteEmision : DateTime.Now,
                 FechaCreacion = facturaEncabezado.FechaCreacion,
                 EsDevolucion = facturaEncabezado.EsDevolucion
             };

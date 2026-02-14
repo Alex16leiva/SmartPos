@@ -24,6 +24,7 @@ namespace Dominio.Context.Entidades
         public string CorreoElectronico { get; set; }
         public int TipoCuentaID { get; set; }
         public DateTime AperturaCuenta { get; set; }
+        public int DiasLimitePagoFactura { get; set; }
         public decimal LimiteCredito { get; set; }
         public decimal SaldoCuenta { get; set; }
         public bool Empleado { get; set; }
@@ -66,6 +67,12 @@ namespace Dominio.Context.Entidades
         public bool TieneCredito()
         {
             return TipoCuenta.IsNotNull() && TipoCuenta.EsCredito;
+        }
+
+        internal bool EstaDentroDelLimiteDeCredito(decimal totalCredito)
+        {
+            totalCredito += SaldoCuenta;
+            return totalCredito < LimiteCredito;
         }
     }
 }

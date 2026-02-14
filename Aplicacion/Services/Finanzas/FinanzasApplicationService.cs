@@ -61,7 +61,7 @@ namespace Aplicacion.Services.Finanzas
             return MapBatchEntidadADto(nuevoBatch);
         }
 
-        private BatchDTO MapBatchEntidadADto(Batch entidad)
+        private static BatchDTO MapBatchEntidadADto(Batch entidad)
         {
             return new BatchDTO
             {

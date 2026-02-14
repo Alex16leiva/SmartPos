@@ -25,11 +25,12 @@ namespace Infraestructura.Context.Mapping.Factura
             builder.Property(r => r.CAI).HasColumnName("CAI").IsUnicode(false).HasMaxLength(70);
             builder.Property(r => r.Correlativo).HasColumnName("Correlativo").IsUnicode(false).HasMaxLength(50);
             builder.Property(r => r.FechaCreacion).HasColumnName("FechaCreacion");
-
             builder.Property(r => r.NumeroReferencia).HasColumnName("NumeroReferencia").IsUnicode(false).HasMaxLength(50);
             builder.Property(r => r.CajeroId).HasColumnName("CajeroId");
+            builder.Property(r => r.FechaVencimiento).HasColumnName("FechaVencimiento");
+            builder.Property(r => r.EstadoFactura).HasColumnName("EstadoFactura");
 
-            //builder.(r => r.Cliente).WithMany(r => r.FacturaEncabezado).HasForeignKey(r => r.ClienteId);
+            builder.HasOne(r => r.Cliente).WithMany(r => r.FacturaEncabezado).HasForeignKey(r => r.ClienteId);
             base.Configure(builder);
         }
     }

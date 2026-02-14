@@ -24,7 +24,6 @@ namespace Dominio.Context.Entidades.FacturaAgg
         public string CAI { get; set; }
         public string Correlativo { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public decimal Saldo { get; set; }
         public DateTime FechaVencimiento { get; set; }
         public string EstadoFactura { get; set; }
         public virtual ICollection<FacturaDetalle> FacturaDetalle { get; set; }
@@ -108,6 +107,25 @@ namespace Dominio.Context.Entidades.FacturaAgg
             }
 
             return nombreCliente;
+        }
+
+        internal void AgregarInformacionRegimenFiscal(RegimenFiscal regimenFiscal)
+        {
+            if (regimenFiscal.IsNotNull())
+            {
+                CAI = string.Empty;
+                Correlativo = string.Empty;
+                Desde = string.Empty;
+                Hasta = string.Empty;
+                FechaLimiteEmision = DateTime.Now;
+                return;
+            }
+
+            CAI = regimenFiscal.CAI.ValueOrEmpty();
+            Correlativo = regimenFiscal.ObtenerCorrelativoNuevo();
+            Desde = regimenFiscal.Desde.ValueOrEmpty();
+            Hasta = regimenFiscal.Hasta.ValueOrEmpty();
+            FechaLimiteEmision = regimenFiscal.FechaLimiteEmision;
         }
     }
 }

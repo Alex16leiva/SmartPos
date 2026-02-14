@@ -19,6 +19,7 @@
         public string CorreoElectronico { get; set; }
         public int TipoCuentaID { get; set; }
         public DateTime AperturaCuenta { get; set; }
+        public int DiasLimitePagoFactura { get; set; }
         public decimal LimiteCredito { get; set; }
         public decimal SaldoCuenta { get; set; }
         public bool Empleado { get; set; }

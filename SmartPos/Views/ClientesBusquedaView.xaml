@@ -16,12 +16,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+
         <TextBox Grid.Row="0" 
-                 Text="{Binding clienteBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                 mah:TextBoxHelper.Watermark="Escriba para buscar por código o descripción..."
-                 mah:TextBoxHelper.ClearTextButton="True"
-                 FontSize="16" Margin="0,0,0,10"
-                 mah:TextBoxHelper.AutoWatermark="True">
+            Text="{Binding ClienteBusqueda, UpdateSourceTrigger=PropertyChanged}"
+            mah:TextBoxHelper.Watermark="Buscar cliente por nombre o ID..."
+            FontSize="16" Margin="0,0,0,10"
+            mah:TextBoxHelper.ClearTextButton="True"
+            mah:TextBoxHelper.AutoWatermark="True">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding SeleccionarClienteCommand}"/>
             </TextBox.InputBindings>
@@ -44,14 +45,14 @@
 
         <Grid Grid.Row="2" Margin="0,15,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Command="{Binding ComandoPaginaAnteriorClientes}" Content="◀" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
+                <Button Command="{Binding PaginaAnteriorClientesCommand}" Content="◀" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
                 <TextBlock VerticalAlignment="Center" Margin="10,0">
                     <Run Text="Página "/>
                     <Run Text="{Binding PaginaActualClientes}" FontWeight="Bold"/>
                     <Run Text=" de "/>
                     <Run Text="{Binding TotalPaginasClientes}"/>
                 </TextBlock>
-                <Button Command="{Binding ComandoPaginaSiguienteClientes}" Content="▶" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
+                <Button Command="{Binding PaginaSiguienteClientesCommand}" Content="▶" Width="40" Style="{StaticResource MahApps.Styles.Button.Flat}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

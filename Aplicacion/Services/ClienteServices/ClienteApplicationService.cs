@@ -64,6 +64,7 @@ namespace Aplicacion.Services.ClienteServices
                 DescuentoActual = request.Cliente.DescuentoActual,
                 NivelPrecio = request.Cliente.NivelPrecio,
                 TipoCuentaID = request.Cliente.TipoCuentaID,
+                DiasLimitePagoFactura = request.Cliente.DiasLimitePagoFactura,
                 LimiteCredito = request.Cliente.LimiteCredito,
                 Pais = request.Cliente.Pais,
                 Departamento = request.Cliente.Departamento,
@@ -162,7 +163,8 @@ namespace Aplicacion.Services.ClienteServices
 
         public ClienteDTO ObtenerClienteGenerico()
         {
-            Cliente cliente = _genericRepository.GetSingle<Cliente>(r => r.NumeroCuenta == "000");
+            List<string> includes = ["TipoCuenta"];
+            Cliente cliente = _genericRepository.GetSingle<Cliente>(r => r.NumeroCuenta == "000", includes);
 
             if (cliente.IsNotNull())
             {
@@ -221,6 +223,7 @@ namespace Aplicacion.Services.ClienteServices
                 Empleado = entidad.Empleado,
                 FotoRuta = entidad.FotoRuta,
                 Id = entidad.Id,
+                DiasLimitePagoFactura = entidad.DiasLimitePagoFactura,
                 LimiteCredito = entidad.LimiteCredito,
                 NivelPrecio = entidad.NivelPrecio,
                 Nombre = entidad.Nombre,
