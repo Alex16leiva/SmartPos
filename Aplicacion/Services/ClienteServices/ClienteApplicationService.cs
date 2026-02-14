@@ -141,6 +141,7 @@ namespace Aplicacion.Services.ClienteServices
             cliente.TextoPersonalizado4 = request.Cliente.TextoPersonalizado4;
             cliente.TextoPersonalizado5 = request.Cliente.TextoPersonalizado5;
             cliente.TipoCuentaID = request.Cliente.TipoCuentaID;
+            cliente.DiasLimitePagoFactura = request.Cliente.DiasLimitePagoFactura;
 
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("ActualizarCliente");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
@@ -185,7 +186,7 @@ namespace Aplicacion.Services.ClienteServices
                     Ciudad = "SPS",
                     Direccion = "CIUDAD",
                     Empleado = false,
-                    NivelPrecio = 1,
+                    NivelPrecio = "Normal",
                     DescuentoActual = 0,
                     LimiteCredito = 0,
                     TipoCuentaID = 1,
@@ -248,7 +249,8 @@ namespace Aplicacion.Services.ClienteServices
                 TotalVisitas = entidad.TotalVisitas,
                 UltimaVisita = entidad.UltimaVisita,
                 VentasTotales = entidad.VentasTotales,
-                TieneCredito = entidad.TieneCredito()
+                TieneCredito = entidad.TieneCredito(),
+                
             };
         }
     }

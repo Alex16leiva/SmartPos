@@ -28,7 +28,7 @@ namespace Dominio.Context.Entidades
         public decimal LimiteCredito { get; set; }
         public decimal SaldoCuenta { get; set; }
         public bool Empleado { get; set; }
-        public int NivelPrecio { get; set; }
+        public string NivelPrecio { get; set; }
         public decimal DescuentoActual { get; set; }
         public string FotoRuta { get; set; }
         public DateTime UltimaVisita { get; set; }

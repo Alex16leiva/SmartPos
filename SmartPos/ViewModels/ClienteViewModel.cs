@@ -3,8 +3,10 @@ using Aplicacion.DTOs.Clientes;
 using Aplicacion.Services.ClienteServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Dominio.Context.Entidades.Finanzas;
 using Dominio.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using ServicioAplicacion.DTOs.TipoCuenta;
 using SmartPos.Comunes.CommonServices;
 using System.Collections.ObjectModel;
 
@@ -20,8 +22,9 @@ namespace SmartPos.ViewModels
         {
             _scopeFactory = scopeFactory;
             _commonService = commonService;
-            _clientes = new ObservableCollection<ClienteDTO>();
+            _clientes = [];
             _ = LoadDataAsync();
+            CargarTiposCuentas();
         }
 
         [ObservableProperty] private ObservableCollection<ClienteDTO> _clientes;
@@ -33,8 +36,9 @@ namespace SmartPos.ViewModels
         [ObservableProperty] private bool _isNuevoCliente;
         [ObservableProperty] private bool _isEditFlyoutOpen;
         [ObservableProperty] private ClienteDTO _clienteSeleccionado;
+        [ObservableProperty] private ObservableCollection<TipoCuentaDTO> _tiposCuentas;
 
-        public List<int> TamañosPagina { get; } = new() { 10, 20, 30, 50, 100 };
+        public List<int> TamañosPagina { get; } = [10, 20, 30, 50, 100];
 
         #region Comandos de UI
 
@@ -204,5 +208,15 @@ namespace SmartPos.ViewModels
         }
 
         #endregion
+
+        private void CargarTiposCuentas()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IClienteApplicationService>();
+                var result = service.ObtenerTipoCuentas(new TipoCuentaRequest());
+                TiposCuentas = new ObservableCollection<TipoCuentaDTO>(result);
+            }
+        }
     }
 }

@@ -64,6 +64,9 @@
                     <DataGridTextColumn Header="Teléfono" Binding="{Binding NumeroTelefono1}" Width="120"/>
                     <DataGridTextColumn Header="Correo" Binding="{Binding CorreoElectronico}" Width="200"/>
                     <DataGridTextColumn Header="Identidad/RTN" Binding="{Binding TextoPersonalizado1}" Width="150"/>
+                    <DataGridTextColumn Header="Es Empleado" Binding="{Binding Empleado}" Width="*" />
+                    <DataGridTextColumn Header="Tiene Credito" Binding="{Binding TieneCredito}" Width="*" />
+                    <DataGridTextColumn Header="Días Límite de Pago (Facturas)" Binding="{Binding DiasLimitePagoFactura}" Width="*" />
                     <DataGridTextColumn Header="Limite de credito" Binding="{Binding LimiteCredito, StringFormat=C2}" Width="100">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock.DataGrid}">
@@ -147,6 +150,44 @@
 
                         <TextBlock Text="Correo"/>
                         <TextBox Text="{Binding ClienteSeleccionado.CorreoElectronico}" Margin="0,5,0,15"/>
+
+                        <TextBlock Text="CONFIGURACIÓN DE VENTAS" FontWeight="Bold" Foreground="{DynamicResource MahApps.Brushes.Accent}" Margin="0,10,0,0"/>
+                        <Separator Margin="0,5,0,15"/>
+
+                        <mah:ToggleSwitch Header="¿Es empleado?" 
+                          IsOn="{Binding ClienteSeleccionado.Empleado}" 
+                          ContentDirection="RightToLeft"
+                          Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Nivel de Precio"/>
+                        <ComboBox SelectedValue="{Binding ClienteSeleccionado.NivelPrecio, UpdateSourceTrigger=PropertyChanged}" 
+                              SelectedValuePath="Content"
+                              Margin="0,5,0,15"
+                              mah:TextBoxHelper.Watermark="Seleccione un nivel">
+                            <ComboBoxItem Content="Normal"/>
+                            <ComboBoxItem Content="A"/>
+                            <ComboBoxItem Content="B"/>
+                            <ComboBoxItem Content="C"/>
+                            <ComboBoxItem Content="D"/>
+                            <ComboBoxItem Content="E"/>
+                        </ComboBox>
+
+                        <TextBlock Text="Tipo de Cuenta"/>
+                        <ComboBox ItemsSource="{Binding TiposCuentas}"
+                          SelectedValue="{Binding ClienteSeleccionado.TipoCuentaID}"
+                          DisplayMemberPath="Descripcion"
+                          SelectedValuePath="TipoCuentaId"
+                          Margin="0,5,0,15"
+                          mah:TextBoxHelper.Watermark="Seleccione un tipo de cuenta"/>
+
+                        <TextBlock Text="Días Límite de Pago (Facturas)"/>
+                        <mah:NumericUpDown Value="{Binding ClienteSeleccionado.DiasLimitePagoFactura}" 
+                           Minimum="0" 
+                           Maximum="365"
+                           Interval="1"
+                           StringFormat="N0"
+                           Margin="0,5,0,15"
+                           mah:TextBoxHelper.Watermark="Ejemplo: 30 días"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,40">
                             <Button Content="CANCELAR" Command="{Binding CerrarEdicionCommand}" 
